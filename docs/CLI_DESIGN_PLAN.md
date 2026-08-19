@@ -1,86 +1,86 @@
 # CLI Design Plan
 
-## 1. Mục tiêu
+## 1. Goals
 
-Thiết kế một CLI thống nhất cho repo `botquanganh_mcp`, phục vụ cả hai nhóm nhu cầu:
+Design a unified CLI for the `botduachuot_mcp` repository serving two needs:
 
-1. Vận hành local service, server bridge và Cloudflare Tunnel.
-2. Gọi các chức năng Host MCP/REST từ terminal mà không cần viết `curl` thủ công.
+1. Operate the local service, the server bridge and the Cloudflare Tunnel.
+2. Call the Host MCP/REST capabilities from the terminal without hand-writing `curl`.
 
-Tên lệnh đề xuất:
+Proposed command name:
 
 ```text
-bqa
+duachuot
 ```
 
-CLI phải ưu tiên:
+The CLI must prioritize:
 
-- dễ nhớ;
-- output rõ ràng;
-- exit code đúng semantics;
-- hỗ trợ JSON để dùng trong script;
-- không restart tunnel khi chỉ thay đổi hoặc restart server;
-- không phá vỡ 12 MCP tools và REST API hiện tại;
-- không tạo thêm một lớp business logic độc lập với core host service.
+- easy to remember;
+- clear output;
+- correct exit-code semantics;
+- JSON support for scripting;
+- no tunnel restart when only the server is changed or restarted;
+- no breakage of the 12 MCP tools and the existing REST API;
+- no extra layer of business logic independent of the core host service.
 
 ---
 
-## 2. Nguyên tắc thiết kế
+## 2. Design principles
 
-### 2.1. Một CLI, hai execution mode
+### 2.1. One CLI, two execution modes
 
-CLI có hai nhóm lệnh:
+The CLI has two command groups:
 
 #### Local operations
 
-Chạy trực tiếp trên máy host và quản lý process/file runtime:
+Run directly on the host machine and manage the process/runtime files:
 
 ```text
-bqa start
-bqa stop
-bqa restart
-bqa status
-bqa url
-bqa server restart
-bqa logs
-bqa config
+duachuot start
+duachuot stop
+duachuot restart
+duachuot status
+duachuot url
+duachuot server restart
+duachuot logs
+duachuot config
 ```
 
 #### API operations
 
-Gọi REST API hiện có:
+Call the existing REST API:
 
 ```text
-bqa health
-bqa capabilities
-bqa fs ...
-bqa cmd ...
-bqa knowledge ...
+duachuot health
+duachuot capabilities
+duachuot fs ...
+duachuot cmd ...
+duachuot knowledge ...
 ```
 
-Mặc định API mode gọi local server:
+By default the API mode calls the local server:
 
 ```text
 http://127.0.0.1:8000
 ```
 
-Có thể chuyển sang tunnel hiện tại:
+Switch to the current tunnel:
 
 ```text
-bqa --public health
+duachuot --public health
 ```
 
-Hoặc chỉ định URL cụ thể:
+Or point at a specific URL:
 
 ```text
-bqa --base-url https://example.trycloudflare.com health
+duachuot --base-url https://example.trycloudflare.com health
 ```
 
-### 2.2. Không duplicate core logic
+### 2.2. No duplicated core logic
 
-CLI không tự triển khai lại logic:
+The CLI must not reimplement:
 
-- path boundary;
+- path boundaries;
 - file read/write/search;
 - command policy;
 - command execution;
@@ -88,42 +88,42 @@ CLI không tự triển khai lại logic:
 - knowledge;
 - authentication.
 
-Các chức năng này phải gọi lại REST API hoặc các script lifecycle chính thức.
+These must call back into the REST API or the official lifecycle scripts.
 
-### 2.3. JSON-first nhưng human-friendly
+### 2.3. JSON-first but human-friendly
 
-Mỗi lệnh hỗ trợ:
+Every command supports:
 
 ```text
 --json
 ```
 
-Mặc định output tối ưu cho người đọc. Khi có `--json`, stdout chỉ chứa JSON hợp lệ để dùng với `jq` hoặc script CI.
+Output is human-optimized by default. With `--json`, stdout contains only valid JSON for `jq` or CI scripts.
 
-### 2.4. Exit code có ý nghĩa
+### 2.4. Meaningful exit codes
 
-Đề xuất:
+Proposal:
 
 ```text
-0   Thành công
-1   Operation thất bại
-2   Sai tham số CLI
-3   Không kết nối được server
-4   Authentication thất bại
-5   Operation bị policy chặn
-6   Resource không tồn tại
+0   Success
+1   Operation failed
+2   Invalid CLI arguments
+3   Cannot reach the server
+4   Authentication failed
+5   Operation blocked by policy
+6   Resource not found
 7   Timeout
-8   Conflict, ví dụ file đã tồn tại
+8   Conflict, e.g. file already exists
 ```
 
-Command được chạy thành công ở phía server nhưng trả exit code khác `0` phải giữ nguyên semantics của command, không coi là lỗi server.
+A command that ran successfully server-side but returned a non-zero exit code must keep the command's own semantics; it is not a server error.
 
 ---
 
-## 3. Cây lệnh đề xuất
+## 3. Proposed command tree
 
 ```text
-bqa
+duachuot
 ├── start
 ├── stop
 ├── restart
@@ -172,74 +172,74 @@ bqa
 
 ---
 
-## 4. Chi tiết từng nhóm lệnh
+## 4. Command group details
 
 ## 4.1. Lifecycle
 
-### `bqa start`
+### `duachuot start`
 
-Tương đương:
+Equivalent to:
 
 ```bash
 ./run_mcp_tunnel.sh start
 ```
 
-Yêu cầu:
+Requirements:
 
 - idempotent;
-- không tạo tunnel thứ hai nếu supervisor đang chạy;
-- in URL ngay khi Cloudflare cấp URL;
-- không đợi bridge ready mới in URL;
-- không đọc URL cũ từ log.
+- no second tunnel if the supervisor is already running;
+- prints the URL as soon as Cloudflare provides it;
+- does not wait for the bridge to be ready before printing the URL;
+- does not read stale URLs from logs.
 
-### `bqa stop`
+### `duachuot stop`
 
-Tương đương:
+Equivalent to:
 
 ```bash
 ./run_mcp_tunnel.sh stop
 ```
 
-Phải dừng supervisor trước, sau đó mới dừng tunnel và server.
+Must stop the supervisor first, then the tunnel and the server.
 
-### `bqa restart`
+### `duachuot restart`
 
-Restart toàn bộ supervisor/server/tunnel.
+Restarts supervisor/server/tunnel as a whole.
 
-Lệnh này phải có cảnh báo rõ rằng Quick Tunnel có thể cấp URL mới.
+This command must clearly warn that the Quick Tunnel may receive a new URL.
 
-Đề xuất yêu cầu xác nhận khi chạy interactive:
+Interactive confirmation is proposed:
 
 ```text
 This may replace the current Cloudflare URL. Continue? [y/N]
 ```
 
-Có thể bỏ qua xác nhận bằng:
+Confirmation can be skipped with:
 
 ```text
 --yes
 ```
 
-### `bqa server restart`
+### `duachuot server restart`
 
-Tương đương:
+Equivalent to:
 
 ```bash
 ./scripts/restart_server_only.sh
 ```
 
-Đây là lệnh mặc định sau thay đổi code thông thường.
+This is the default command after routine code changes.
 
-Yêu cầu:
+Requirements:
 
-- không restart tunnel;
-- kiểm tra tunnel PID trước và sau;
-- cảnh báo nếu tunnel PID thay đổi ngoài dự kiến;
-- xác minh bridge socket ready.
+- no tunnel restart;
+- check the tunnel PID before and after;
+- warn if the tunnel PID changed unexpectedly;
+- verify the bridge socket is ready.
 
-### `bqa status`
+### `duachuot status`
 
-Output đề xuất:
+Proposed output:
 
 ```text
 Supervisor  running   pid=65413
@@ -251,7 +251,7 @@ Auth        disabled
 Workspace   /home/light/GitHub
 ```
 
-Với `--json`:
+With `--json`:
 
 ```json
 {
@@ -268,20 +268,20 @@ Với `--json`:
 
 ---
 
-## 4.2. Health và capabilities
+## 4.2. Health and capabilities
 
-### `bqa health`
+### `duachuot health`
 
-Gọi:
+Calls:
 
 ```text
 GET /api/v1/health
 ```
 
-Output human-readable:
+Human-readable output:
 
 ```text
-Service       botquanganh-host-mcp
+Service       botduachuot-host-mcp
 Version       1.0.0
 Status        healthy
 Uptime        12m 31s
@@ -290,55 +290,55 @@ Errors        0
 Avg latency   1.2 ms
 ```
 
-### `bqa capabilities`
+### `duachuot capabilities`
 
-Gọi:
+Calls:
 
 ```text
 GET /api/v1/capabilities
 ```
 
-Có thể lọc:
+Filterable:
 
 ```text
-bqa capabilities --tools
-bqa capabilities --limits
-bqa capabilities --host
+duachuot capabilities --tools
+duachuot capabilities --limits
+duachuot capabilities --host
 ```
 
 ---
 
 ## 4.3. File system
 
-### `bqa fs ls`
+### `duachuot fs ls`
 
 ```bash
-bqa fs ls GitHub
-bqa fs ls GitHub --max 100
-bqa fs ls GitHub --json
+duachuot fs ls GitHub
+duachuot fs ls GitHub --max 100
+duachuot fs ls GitHub --json
 ```
 
-Gọi:
+Calls:
 
 ```text
 GET /api/v1/files
 ```
 
-### `bqa fs cat`
+### `duachuot fs cat`
 
 ```bash
-bqa fs cat GitHub/project/README.md
-bqa fs cat file.txt --lines 20:50
-bqa fs cat file.txt --max-bytes 100000
+duachuot fs cat GitHub/project/README.md
+duachuot fs cat file.txt --lines 20:50
+duachuot fs cat file.txt --max-bytes 100000
 ```
 
-Gọi:
+Calls:
 
 ```text
 GET /api/v1/files/content
 ```
 
-Quy ước `--lines`:
+`--lines` convention:
 
 ```text
 20:50
@@ -347,60 +347,60 @@ Quy ước `--lines`:
 20
 ```
 
-### `bqa fs write`
+### `duachuot fs write`
 
-Hỗ trợ ba nguồn nội dung:
+Supports three content sources:
 
 ```bash
-bqa fs write path.txt --text "hello"
-bqa fs write path.txt --from local.txt
-printf 'hello' | bqa fs write path.txt --stdin
+duachuot fs write path.txt --text "hello"
+duachuot fs write path.txt --from local.txt
+printf 'hello' | duachuot fs write path.txt --stdin
 ```
 
-Flag:
+Flags:
 
 ```text
 --no-overwrite
 --no-create-parents
 ```
 
-### `bqa fs append`
+### `duachuot fs append`
 
 ```bash
-bqa fs append path.txt --text "next line"
-printf 'next line' | bqa fs append path.txt --stdin
+duachuot fs append path.txt --text "next line"
+printf 'next line' | duachuot fs append path.txt --stdin
 ```
 
-### `bqa fs replace`
+### `duachuot fs replace`
 
 ```bash
-bqa fs replace path.txt --old "before" --new "after"
-bqa fs replace path.txt --old-file old.txt --new-file new.txt
-bqa fs replace path.txt --expected-count 1
+duachuot fs replace path.txt --old "before" --new "after"
+duachuot fs replace path.txt --old-file old.txt --new-file new.txt
+duachuot fs replace path.txt --expected-count 1
 ```
 
-### `bqa fs mkdir`
+### `duachuot fs mkdir`
 
 ```bash
-bqa fs mkdir project/data
-bqa fs mkdir project/data --no-parents
+duachuot fs mkdir project/data
+duachuot fs mkdir project/data --no-parents
 ```
 
-### `bqa fs search`
+### `duachuot fs search`
 
 ```bash
-bqa fs search "FastMCP" --path GitHub/botquanganh_mcp
-bqa fs search "REQUIRE_AUTH" --case-sensitive --max 50
+duachuot fs search "FastMCP" --path GitHub/botduachuot_mcp
+duachuot fs search "REQUIRE_AUTH" --case-sensitive --max 50
 ```
 
 ---
 
 ## 4.4. Command execution
 
-### `bqa cmd check`
+### `duachuot cmd check`
 
 ```bash
-bqa cmd check 'git status --short'
+duachuot cmd check 'git status --short'
 ```
 
 Output:
@@ -412,7 +412,7 @@ Commands      git
 Severity      none
 ```
 
-Nếu bị chặn:
+When blocked:
 
 ```text
 Allowed       no
@@ -420,81 +420,81 @@ Rule          privilege_escalation
 Message       Privilege escalation is blocked through MCP host tools.
 ```
 
-### `bqa cmd run`
+### `duachuot cmd run`
 
 ```bash
-bqa cmd run 'git status --short' --cwd GitHub/botquanganh_mcp
-bqa cmd run --timeout 60 'pytest -q'
+duachuot cmd run 'git status --short' --cwd GitHub/botduachuot_mcp
+duachuot cmd run --timeout 60 'pytest -q'
 ```
 
-Quy tắc output:
+Output rules:
 
-- stdout của command in ra stdout;
-- stderr của command in ra stderr;
-- metadata chỉ in khi dùng `--verbose`;
-- `--json` trả toàn bộ response envelope;
-- exit code CLI mặc định phản ánh exit code command nếu request được xử lý thành công;
-- lỗi server, policy hoặc timeout dùng exit code riêng của CLI.
+- command stdout goes to stdout;
+- command stderr goes to stderr;
+- metadata only printed with `--verbose`;
+- `--json` returns the full response envelope;
+- the CLI exit code mirrors the command's exit code when the request was handled successfully;
+- server errors, policy blocks and timeouts use dedicated CLI exit codes.
 
-Đề xuất thêm:
+Proposed addition:
 
 ```text
 --check-first
 ```
 
-để gọi command policy endpoint trước khi thực thi.
+to call the command-policy endpoint before executing.
 
 ---
 
-## 4.5. Knowledge và inventory
+## 4.5. Knowledge and inventory
 
-### `bqa knowledge overview`
-
-```bash
-bqa knowledge overview
-```
-
-### `bqa knowledge guide`
+### `duachuot knowledge overview`
 
 ```bash
-bqa knowledge guide
-bqa knowledge guide --query docker
+duachuot knowledge overview
 ```
 
-### `bqa knowledge tools`
+### `duachuot knowledge guide`
 
 ```bash
-bqa knowledge tools
-bqa knowledge tools --query python
-bqa knowledge tools --category security
-bqa knowledge tools --versions
-bqa knowledge tools --all
-bqa knowledge tools --uncatalogued
-bqa knowledge tools --refresh
+duachuot knowledge guide
+duachuot knowledge guide --query docker
 ```
 
-### `bqa knowledge search`
+### `duachuot knowledge tools`
 
 ```bash
-bqa knowledge search docker
+duachuot knowledge tools
+duachuot knowledge tools --query python
+duachuot knowledge tools --category security
+duachuot knowledge tools --versions
+duachuot knowledge tools --all
+duachuot knowledge tools --uncatalogued
+duachuot knowledge tools --refresh
 ```
 
-Tìm đồng thời trong guide và tool inventory.
+### `duachuot knowledge search`
+
+```bash
+duachuot knowledge search docker
+```
+
+Searches guides and tool inventory at once.
 
 ---
 
 ## 4.6. Logs
 
 ```bash
-bqa logs server
-bqa logs tunnel
-bqa logs launcher
-bqa logs audit
-bqa logs follow server
-bqa logs follow --all
+duachuot logs server
+duachuot logs tunnel
+duachuot logs launcher
+duachuot logs audit
+duachuot logs follow server
+duachuot logs follow --all
 ```
 
-Flag:
+Flags:
 
 ```text
 -n, --lines 100
@@ -503,15 +503,15 @@ Flag:
 --grep ERROR
 ```
 
-CLI chỉ đọc file log local. Không cung cấp thao tác xóa log mặc định.
+The CLI only reads local log files. No log deletion operation is provided by default.
 
 ---
 
 ## 4.7. Config
 
-### `bqa config show`
+### `duachuot config show`
 
-Chỉ hiển thị các cấu hình không nhạy cảm và che secret:
+Shows only non-sensitive settings and masks secrets:
 
 ```text
 MCP_BIND_HOST=127.0.0.1
@@ -522,54 +522,54 @@ HOST_WORKSPACE_DIR=/home/light/GitHub
 HOST_COMMAND_POLICY=guarded
 ```
 
-### `bqa config get`
+### `duachuot config get`
 
 ```bash
-bqa config get HOST_WORKSPACE_DIR
+duachuot config get HOST_WORKSPACE_DIR
 ```
 
-Không được in giá trị thật của `GATEWAY_TOKEN` trừ khi có flag rõ ràng, và mặc định không nên hỗ trợ flag đó.
+The real `GATEWAY_TOKEN` must never be printed unless an explicit flag says so, and by default such a flag should not exist.
 
-### `bqa config path`
+### `duachuot config path`
 
 ```text
-/home/light/GitHub/botquanganh_mcp/.env
+/home/light/GitHub/botduachuot_mcp/.env
 ```
 
-### `bqa config validate`
+### `duachuot config validate`
 
-Kiểm tra:
+Checks:
 
-- `.env` tồn tại;
-- port hợp lệ;
-- workspace tồn tại;
-- knowledge directory tồn tại;
-- command policy hợp lệ;
-- auth/token nhất quán;
-- `cloudflared` tồn tại nếu dùng tunnel;
-- `.venv/bin/fastmcp` tồn tại;
-- PID file có stale PID hay không.
+- `.env` exists;
+- port is valid;
+- workspace exists;
+- knowledge directory exists;
+- command policy is valid;
+- auth/token consistency;
+- `cloudflared` exists when the tunnel is used;
+- `.venv/bin/fastmcp` exists;
+- PID file has no stale PID.
 
 ---
 
 ## 4.8. Doctor
 
 ```bash
-bqa doctor
+duachuot doctor
 ```
 
-Thực hiện một bộ kiểm tra không phá hoại:
+Runs a non-destructive set of checks:
 
-1. Kiểm tra Python virtual environment.
-2. Kiểm tra `fastmcp` và `cloudflared`.
-3. Validate `.env`.
-4. Kiểm tra PID file.
-5. Kiểm tra bridge socket.
-6. Gọi local `/healthz`.
-7. Gọi local REST health.
-8. Nếu tunnel đang chạy, gọi public REST health.
-9. Nếu có URL, kiểm tra MCP initialize.
-10. Cảnh báo auth đang tắt khi endpoint public.
+1. Python virtual environment.
+2. `fastmcp` and `cloudflared`.
+3. `.env` validation.
+4. PID file.
+5. Bridge socket.
+6. Local `/healthz`.
+7. Local REST health.
+8. Public REST health when the tunnel is running.
+9. MCP initialize when a URL exists.
+10. Warn when auth is off on a public endpoint.
 
 Output:
 
@@ -585,7 +585,7 @@ PASS  MCP initialize
 WARN  public endpoint has REQUIRE_AUTH=false
 ```
 
-`doctor` không tự sửa cấu hình và không restart process.
+`doctor` never fixes the configuration and never restarts processes.
 
 ---
 
@@ -606,19 +606,19 @@ WARN  public endpoint has REQUIRE_AUTH=false
 -h, --help
 ```
 
-Ưu tiên lấy token theo thứ tự:
+Token resolution order:
 
 1. `--token`.
 2. `--token-file`.
 3. `BQA_TOKEN`.
-4. `GATEWAY_TOKEN` trong environment.
-5. `.env` của repo.
+4. `GATEWAY_TOKEN` in the environment.
+5. The repository `.env`.
 
-Token không được xuất hiện trong error message, debug log hoặc command history do CLI tự tạo.
+Tokens must never appear in error messages, debug logs or CLI-generated command history.
 
 ---
 
-## 6. Kiến trúc code đề xuất
+## 6. Proposed code architecture
 
 ```text
 app/
@@ -642,7 +642,7 @@ app/
         └── doctor.py
 
 bin/
-└── bqa
+└── duachuot
 
 tests/
 ├── test_cli_parser.py
@@ -654,121 +654,121 @@ tests/
 
 ### `app/cli/parser.py`
 
-Dùng `argparse` trong standard library để tránh thêm dependency runtime chỉ cho CLI.
+Uses `argparse` from the standard library to avoid an extra runtime dependency for the CLI.
 
 ### `app/cli/client.py`
 
-REST client dùng `urllib.request` trong standard library.
+REST client using `urllib.request` from the standard library.
 
-Trách nhiệm:
+Responsibilities:
 
 - resolve base URL;
-- thêm auth header;
-- encode query;
+- add auth headers;
+- encode queries;
 - encode/decode JSON;
 - timeout;
-- map HTTP error sang CLI exception;
-- không retry các thao tác ghi mặc định.
+- map HTTP errors to CLI exceptions;
+- no default retry for write operations.
 
 ### `app/cli/output.py`
 
-Trách nhiệm:
+Responsibilities:
 
 - human-readable rendering;
 - JSON rendering;
 - stderr/stdout separation;
-- color chỉ khi terminal hỗ trợ;
-- không color khi pipe hoặc có `NO_COLOR`.
+- color only when the terminal supports it;
+- no color when piped or `NO_COLOR` is set.
 
 ### `app/cli/lifecycle.py`
 
-Chỉ wrap các script chính thức:
+Wraps only the official scripts:
 
 ```text
 run_mcp_tunnel.sh
 scripts/restart_server_only.sh
 ```
 
-Không copy logic process management vào Python.
+No process-management logic is copied into Python.
 
 ---
 
-## 7. Packaging và executable
+## 7. Packaging and executable
 
-Repo hiện chưa có `pyproject.toml`. Có hai bước triển khai:
+The repository currently has no `pyproject.toml`. Two deployment steps:
 
-### Giai đoạn đầu
+### Early stage
 
-Tạo wrapper:
+Create a wrapper:
 
 ```text
-bin/bqa
+bin/duachuot
 ```
 
-Wrapper gọi:
+The wrapper calls:
 
 ```bash
 exec "$ROOT_DIR/.venv/bin/python" -m app.cli.main "$@"
 ```
 
-Người dùng có thể chạy:
+Users can run:
 
 ```bash
-./bin/bqa status
+./bin/duachuot status
 ```
 
-Có thể tạo symlink local:
+A local symlink can be created:
 
 ```bash
-ln -s /home/light/GitHub/botquanganh_mcp/bin/bqa ~/.local/bin/bqa
+ln -s /home/light/GitHub/botduachuot_mcp/bin/duachuot ~/.local/bin/duachuot
 ```
 
-### Giai đoạn packaging
+### Packaging stage
 
-Thêm `pyproject.toml` và console entry point:
+Add `pyproject.toml` and the console entry point:
 
 ```toml
 [project.scripts]
-bqa = "app.cli.main:main"
+duachuot = "app.cli.main:main"
 ```
 
-Sau đó:
+Then:
 
 ```bash
 pip install -e .
 ```
 
-Không bắt buộc packaging ngay trong phiên bản CLI đầu tiên.
+Packaging is not required for the first CLI version.
 
 ---
 
-## 8. UX và output conventions
+## 8. UX and output conventions
 
-### Thành công
+### Success
 
 ```text
 [+] Host MCP server restarted.
 ```
 
-### Thông tin
+### Info
 
 ```text
 [i] Tunnel was not restarted.
 ```
 
-### Cảnh báo
+### Warning
 
 ```text
 [!] Public endpoint is running without authentication.
 ```
 
-### Lỗi
+### Error
 
 ```text
 [-] Unable to connect to http://127.0.0.1:8000.
 ```
 
-Khi stdout đang được pipe, prefix và màu có thể được loại bỏ để output dễ parse.
+When stdout is piped, prefixes and colors may be dropped for easy parsing.
 
 ---
 
@@ -778,20 +778,20 @@ Khi stdout đang được pipe, prefix và màu có thể được loại bỏ �
 
 ### Parser
 
-- mọi command/subcommand;
-- required argument;
-- alias;
+- every command/subcommand;
+- required arguments;
+- aliases;
 - conflicting flags;
 - `--json`;
-- `--public` và `--base-url`;
-- line range parser.
+- `--public` and `--base-url`;
+- line-range parser.
 
 ### REST client
 
-- URL join;
+- URL joining;
 - query encoding;
-- auth header;
-- JSON response;
+- auth headers;
+- JSON responses;
 - invalid JSON;
 - HTTP 400/401/403/404/408/409/429/500;
 - network timeout;
@@ -808,13 +808,13 @@ Khi stdout đang được pipe, prefix và màu có thể được loại bỏ �
 ### Lifecycle
 
 - script mapping;
-- server-only restart không gọi tunnel restart;
-- full restart yêu cầu xác nhận;
-- PID và URL checks.
+- server-only restart does not call tunnel restart;
+- full restart requires confirmation;
+- PID and URL checks.
 
 ## 9.2. Integration tests
 
-Dùng Starlette TestClient hoặc isolated local server:
+Use the Starlette TestClient or an isolated local server:
 
 - health;
 - capabilities;
@@ -822,32 +822,32 @@ Dùng Starlette TestClient hoặc isolated local server:
 - command check/run;
 - knowledge;
 - auth enabled/disabled;
-- exit code mapping.
+- exit-code mapping.
 
 ## 9.3. Manual regression
 
 ```text
-PASS: bqa status
-PASS: bqa health
-PASS: bqa --public health
-PASS: bqa fs ls
-PASS: bqa fs cat
-PASS: bqa fs write/append/replace/search
-PASS: bqa cmd check
-PASS: bqa cmd run success
-PASS: bqa cmd run non-zero exit
-PASS: bqa cmd run timeout
-PASS: bqa knowledge tools
-PASS: bqa logs server
-PASS: bqa config validate
-PASS: bqa doctor
-PASS: bqa server restart preserves tunnel PID and URL
-PASS: bqa start is idempotent
+PASS: duachuot status
+PASS: duachuot health
+PASS: duachuot --public health
+PASS: duachuot fs ls
+PASS: duachuot fs cat
+PASS: duachuot fs write/append/replace/search
+PASS: duachuot cmd check
+PASS: duachuot cmd run success
+PASS: duachuot cmd run non-zero exit
+PASS: duachuot cmd run timeout
+PASS: duachuot knowledge tools
+PASS: duachuot logs server
+PASS: duachuot config validate
+PASS: duachuot doctor
+PASS: duachuot server restart preserves tunnel PID and URL
+PASS: duachuot start is idempotent
 ```
 
 ---
 
-## 10. Lộ trình triển khai
+## 10. Implementation roadmap
 
 ### Phase 1 — Core CLI foundation
 
@@ -857,7 +857,7 @@ PASS: bqa start is idempotent
 - REST client;
 - error mapping;
 - output formatter;
-- `bin/bqa`;
+- `bin/duachuot`;
 - `version`, `health`, `capabilities`.
 
 ### Phase 2 — Host operations
@@ -865,7 +865,7 @@ PASS: bqa start is idempotent
 - `fs`;
 - `cmd`;
 - `knowledge`;
-- tests cho API commands.
+- tests for the API commands.
 
 ### Phase 3 — Lifecycle operations
 
@@ -875,7 +875,7 @@ PASS: bqa start is idempotent
 - `status`;
 - `url`;
 - `server restart`;
-- xác minh giữ nguyên tunnel khi restart server.
+- verify the tunnel survives a server restart.
 
 ### Phase 4 — Operations UX
 
@@ -894,117 +894,117 @@ PASS: bqa start is idempotent
 
 ---
 
-## 11. Tiêu chí nghiệm thu
+## 11. Acceptance criteria
 
-CLI được coi là hoàn thành bản v1 khi:
+The CLI counts as v1 complete when:
 
-1. `bqa --help` hiển thị đầy đủ command tree.
-2. `bqa health` gọi được local REST API.
-3. `bqa --public health` dùng đúng URL trong `logs/tunnel_url.txt`.
-4. `bqa fs` bao phủ đầy đủ file REST endpoints.
-5. `bqa cmd` giữ đúng command exit code semantics.
-6. `bqa knowledge` bao phủ đủ các section hiện tại.
-7. `bqa server restart` không đổi tunnel PID hoặc URL.
-8. `bqa restart` cảnh báo URL tunnel có thể thay đổi.
-9. `bqa status --json` trả JSON hợp lệ.
-10. Token luôn được che trong output và logs.
-11. Toàn bộ test cũ vẫn pass.
-12. Test CLI mới pass.
-13. Manual regression qua local và public URL pass.
-14. Không restart tunnel trong quá trình triển khai thông thường.
+1. `duachuot --help` shows the full command tree.
+2. `duachuot health` reaches the local REST API.
+3. `duachuot --public health` uses the URL in `logs/tunnel_url.txt`.
+4. `duachuot fs` covers the full file REST endpoints.
+5. `duachuot cmd` preserves command exit-code semantics.
+6. `duachuot knowledge` covers the current sections.
+7. `duachuot server restart` does not change the tunnel PID or URL.
+8. `duachuot restart` warns that the tunnel URL may change.
+9. `duachuot status --json` returns valid JSON.
+10. Tokens are always masked in output and logs.
+11. All existing tests still pass.
+12. New CLI tests pass.
+13. Manual regression passes over local and public URLs.
+14. No tunnel restart during routine development.
 
 ---
 
-## 12. Phạm vi ngoài bản v1
+## 12. Out of v1 scope
 
-Chưa triển khai trong CLI v1:
+Not implemented in CLI v1:
 
 - interactive TUI;
-- remote file upload binary;
-- websocket/SSE monitor;
-- tự động rotate token;
-- tự động deploy production;
-- quản lý nhiều remote profile phức tạp;
+- remote binary upload;
+- websocket/SSE monitoring;
+- automatic token rotation;
+- automatic production deployment;
+- complex multi-remote profile management;
 - plugin system;
-- tự động sửa `.env` mà không có lệnh rõ ràng từ người dùng.
+- automatic `.env` fixes without an explicit user command.
 
-Các phần này có thể được xem xét cho v2 sau khi CLI v1 ổn định.
+These may be considered for v2 once CLI v1 is stable.
 
 
 ---
 
-## 13. Trạng thái triển khai
+## 13. Implementation status
 
-Cập nhật ngày 20/07/2026: toàn bộ Phase 1–5 đã được triển khai.
+Updated 2026-07-20: all of Phases 1–5 are implemented.
 
 ### Phase 1 — Core CLI foundation: DONE
 
 - `app/cli/main.py`;
-- parser và global option normalization;
+- parser and global option normalization;
 - context/base URL/token resolution;
-- REST client dùng standard library;
-- error mapping và exit codes;
-- output human/JSON, color và secret redaction;
+- REST client using the standard library;
+- error mapping and exit codes;
+- human/JSON output, color and secret redaction;
 - `version`, `health`, `capabilities`;
-- executable `bin/bqa`.
+- `bin/duachuot` executable.
 
 ### Phase 2 — Host operations: DONE
 
-- toàn bộ `fs` commands;
-- `cmd check` và `cmd run`;
-- bảo toàn command exit code khi REST hiện map command failure thành HTTP 500;
-- toàn bộ `knowledge` sections;
-- unit và integration tests.
+- all `fs` commands;
+- `cmd check` and `cmd run`;
+- command exit code preserved when REST maps command failure to HTTP 500;
+- all `knowledge` sections;
+- unit and integration tests.
 
 ### Phase 3 — Lifecycle operations: DONE
 
 - `start`, `stop`, `restart`, `status`, `url`;
-- `server restart` và `server status`;
-- full restart yêu cầu xác nhận hoặc `--yes`;
-- server-only restart xác minh tunnel PID và URL trước/sau;
-- status chỉ dùng canonical URL file, không đọc URL từ log cũ.
+- `server restart` and `server status`;
+- full restart requires confirmation or `--yes`;
+- server-only restart verifies tunnel PID and URL before/after;
+- status uses only the canonical URL file, never stale log URLs.
 
 ### Phase 4 — Operations UX: DONE
 
-- logs: targets, tail, follow, grep, since và JSON;
-- config: show, get, path và validate;
-- doctor: local/public REST và MCP initialize;
-- completion: Bash, Zsh và Fish;
+- logs: targets, tail, follow, grep, since and JSON;
+- config: show, get, path and validate;
+- doctor: local/public REST and MCP initialize;
+- completion: Bash, Zsh and Fish;
 - README examples;
 - automated manual regression script.
 
 ### Phase 5 — Packaging: DONE
 
 - `pyproject.toml`;
-- console entry point `bqa`;
+- `duachuot` console entry point;
 - editable install;
-- `install_basic.sh` tự cài CLI;
-- `.gitignore` cho packaging artifacts.
+- `install_basic.sh` installs the CLI automatically;
+- `.gitignore` for packaging artifacts.
 
-### Điều chỉnh so với thiết kế ban đầu
+### Adjustments vs the original design
 
-Global HTTP timeout dùng tên:
+The global HTTP timeout is named:
 
 ```text
 --request-timeout
 ```
 
-thay vì global `--timeout`, để tránh xung đột với:
+instead of the global `--timeout`, to avoid clashing with:
 
 ```text
-bqa cmd run --timeout <command-timeout>
+duachuot cmd run --timeout <command-timeout>
 ```
 
-### Kết quả nghiệm thu
+### Acceptance results
 
 - pytest: `37 passed`;
 - manual regression: `18/18 PASS`;
 - marker: `ALL_CLI_MANUAL_TESTS=PASS`;
-- server-only restart thật giữ nguyên tunnel PID và URL;
-- full stop/restart chỉ được chạy trong môi trường cô lập;
-- không restart Cloudflare Tunnel thật trong quá trình triển khai.
+- real server-only restart keeps the tunnel PID and URL;
+- full stop/restart was only run in an isolated environment;
+- no real Cloudflare Tunnel restart during development.
 
-Chi tiết xem:
+See:
 
 - `docs/CLI_MANUAL_TEST_PLAN.md`;
 - `docs/CLI_IMPLEMENTATION_REPORT.md`;

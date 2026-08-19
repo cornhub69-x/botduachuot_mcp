@@ -1,25 +1,25 @@
 # Working Guide
 
-## Trình tự làm việc đề xuất
+## Recommended workflow
 
-1. Gọi `host_knowledge(section="overview")` để đọc workspace, policy và danh sách tài liệu.
-2. Gọi `host_knowledge(section="tools", query="<tool>")` trước khi giả định một command đã được cài.
-3. Dùng `host_list_directory`, `host_read_file` và `host_search_text` để hiểu project trước khi sửa.
-4. Dùng `host_check_command` cho command có tác động lớn hoặc khó đoán.
-5. Sửa file bằng `host_write_file` hoặc `host_replace_in_file` khi có thể.
-6. Chạy test/lint bằng `host_run_command` và báo lại bằng chứng thực tế.
+1. Call `duachuot_knowledge(section="overview")` to read the workspace, policy and document list.
+2. Call `duachuot_knowledge(section="tools", query="<tool>")` before assuming a command is installed.
+3. Use `duachuot_list_directory`, `duachuot_read_file` and `duachuot_search_text` to understand a project before modifying it.
+4. Use `duachuot_check_command` for high-impact or hard-to-predict commands.
+5. Modify files with `duachuot_write_file` or `duachuot_replace_in_file` where possible.
+6. Run tests/lint with `duachuot_run_command` and report real evidence.
 
-## Quy tắc sửa code
+## Code modification rules
 
-- Không ghi đè thay đổi sẵn có nếu chưa kiểm tra `git status` và `git diff`.
-- Ưu tiên thay đổi nhỏ, có test và có thể rollback.
-- Không khẳng định đã sửa xong nếu chưa chạy kiểm tra phù hợp.
-- Không ghi secret, token hoặc toàn bộ command nhạy cảm vào log/tài liệu.
-- Dùng đường dẫn tương đối từ `HOST_WORKSPACE_DIR` khi có thể.
+- Never overwrite existing changes without checking `git status` and `git diff`.
+- Prefer small, tested, rollback-able changes.
+- Never claim something is fixed without running the appropriate checks.
+- Never write secrets, tokens or full sensitive commands into logs or docs.
+- Use relative paths from `HOST_WORKSPACE_DIR` when possible.
 
-## Khi chạy command
+## When running commands
 
-- Đặt `cwd` đúng project.
-- Dùng timeout phù hợp.
-- Đọc `exit_code`, `stdout`, `stderr` và cờ `*_truncated`.
-- Nếu command bị policy chặn, không cố bypass từ phía caller; thay đổi config phía server hoặc chọn cách an toàn hơn.
+- Set `cwd` to the correct project.
+- Use a sensible timeout.
+- Read `exit_code`, `stdout`, `stderr` and the `*_truncated` flags.
+- If a command is blocked by policy, do not try to bypass it from the caller side; change the server-side config or pick a safer approach.

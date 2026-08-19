@@ -1,78 +1,78 @@
 # Investigation Subsystem — BotDuaChuot
 
-Tài liệu kỹ thuật cho khối điều tra (Forensics + OSINT + Geo) của BotDuaChuot:
-`app/geo/`, `app/ops/`, `app/platform/`, các MCP tool `duachuot_*` mới, playbook
-và skills. Bổ sung cho `ARCHITECTURE.md` (runtime) và `SECURITY.md` (bảo mật).
+Technical documentation for the investigation stack (Forensics + OSINT + Geo) of BotDuaChuot:
+`app/geo/`, `app/ops/`, `app/platform/`, the new `duachuot_*` MCP tools, playbooks
+and skills. Complements `ARCHITECTURE.md` (runtime) and `SECURITY.md` (security).
 
 ## 1. Geo Engine (`app/geo/`) — offline, deterministic
 
-| Module | Trách nhiệm |
+| Module | Responsibility |
 |---|---|
-| `convert.py` | DMS ↔ decimal ↔ UTM ↔ MGRS; datum transform WGS84/ED50/NAD27/GRS80 (Helmert 7 tham số) |
-| `geodesic.py` | Vincenty inverse + great-circle fallback; `uncertainty_from_dop` (HPE/DOP → bán kính sai số) |
-| `exif_gps.py` | Trích GPS EXIF: exiftool (primary) + exiv2 (cross-check); 2 nguồn bất đồng → `None`, không merge yên lặng |
-| `reverse.py` | Reverse geocoding offline theo `datasets/landmarks.json` (46 landmark, haversine + geodesic) |
-| `timezone.py` | Bảng timezone offline (50+ zone) theo bbox |
+| `convert.py` | DMS ↔ decimal ↔ UTM ↔ MGRS; datum transform WGS84/ED50/NAD27/GRS80 (7-parameter Helmert) |
+| `geodesic.py` | Vincenty inverse + great-circle fallback; `uncertainty_from_dop` (HPE/DOP → error radius) |
+| `exif_gps.py` | EXIF GPS extraction: exiftool (primary) + exiv2 (cross-check); conflicting sources → `None`, never merged silently |
+| `reverse.py` | Offline reverse geocoding over `datasets/landmarks.json` (46 landmarks, haversine + geodesic) |
+| `timezone.py` | Offline timezone table (50+ zones) keyed by bbox |
 
-Quyết định kỹ thuật đáng chú ý:
+Notable design decisions:
 
-- **MGRS theo chuẩn NGA**: zone lẻ dùng set cột 8 ký tự trước, zone chẵn dùng set
-  hàng 20 ký tự trước. Northing MGRS đo từ xích đạo cả 2 bán cầu (khác UTM nam:
-  `utm_S = 10,000,000 - mgrs_northing`).
-- **`from_mgrs` khử mơ hồ chu kỳ 2,000,000 m** bằng lat band: sinh 6 ứng viên
-  (k=0..5) và chọn ứng viên nằm trong dải vĩ độ của band (tolerance 0.01° cho
-  sai số truncation 5 chữ số) đồng thời nằm trong cửa sổ kinh tuyến trung tâm
-  ±3.5° (loại output garbage của inverse UTM khi northing vượt cực). Band X là
-  12° (72–84), các band khác 8°.
-- **Round-trip đạt ≤4 m** trên 20 điểm kiểm thử phủ cả 2 bán cầu, cực, kinh tuyến
-  đổi ngày, biên band. Bộ test: `tests/geo/test_geo_engine.py` (36 tests).
+- **NGA-standard MGRS**: odd zones use the 8-character column set first, even zones
+  the 20-character row set first. MGRS northing is measured from the equator on both
+  hemispheres (unlike UTM south: `utm_S = 10,000,000 - mgrs_northing`).
+- **`from_mgrs` disambiguates the 2,000,000 m period** via the latitude band: it
+  generates 6 candidates (k=0..5) and keeps the candidate inside the band's
+  latitude range (0.01° tolerance for 5-digit truncation error) and inside the
+  central-meridian window of ±3.5° (rejects garbage produced by the inverse UTM
+  when the northing crosses a pole). Band X is 12° (72–84); other bands are 8°.
+- **Round-trip within ≤4 m** across 20 test points covering both hemispheres, the
+  poles, the antimeridian and band edges. Test suite: `tests/geo/test_geo_engine.py` (36 tests).
 
 ## 2. OPSEC Gate (`app/ops/gate.py`)
 
-8 luật cứng (từ PLAN v2.0 mục 7). API:
+8 hard rules (from PLAN v2.0, section 7). API:
 
-- `gate_command(cmd, mode, dry_run)` — inspect lệnh local: chặn telemetry host
-  (ip-api, api.ipify, geoip-db, ipinfo, shodan, censys...), chặn tool tấn công
-  tự động (sqlmap, nmap, hydra, masscan, ffuf, metasploit...), chặn discovery
-  công khai khi `ctf-live` (sherlock/maigret/whois/dnsrecon/search engine),
-  chặn flag-like string trong lệnh.
-- `gate_remote_request(target, mode, dry_run)` — cùng luật cho target mạng.
-- `redact_secrets(text)` — redact flag/token/secret trước khi lưu log.
-- `jitter_delay()` / `suggest_jitter_seconds()` — delay 800–3000 ms giữa các
-  truy vấn mạng (giả lập người, cấm burst song song).
+- `gate_command(cmd, mode, dry_run)` — inspects local commands: blocks telemetry
+  hosts (ip-api, api.ipify, geoip-db, ipinfo, shodan, censys...), blocks automated
+  attack tools (sqlmap, nmap, hydra, masscan, ffuf, metasploit...), blocks public
+  discovery when `ctf-live` (sherlock/maigret/whois/dnsrecon/search engines),
+  blocks flag-like strings inside commands.
+- `gate_remote_request(target, mode, dry_run)` — same rules for network targets.
+- `redact_secrets(text)` — redacts flag/token/secret before writing logs.
+- `jitter_delay()` / `suggest_jitter_seconds()` — 800–3000 ms delay between network
+  queries (human-like pacing, no parallel bursts).
 
-Mode mặc định `ctf-live` từ `app.config.OSINT_MODE` (False). Bật
-`OSINT_MODE=true` chỉ khi operator xác nhận challenge cho phép lookup bên ngoài.
+Default mode is `ctf-live` from `app.config.OSINT_MODE` (False). Set
+`OSINT_MODE=true` only when the operator confirms the challenge allows external lookups.
 
 ## 3. Platform Adapter (`app/platform/`)
 
 - `probe_platform()` — OS/arch/distro (`/etc/os-release`)/shell/package managers,
-  cache bằng `lru_cache`.
+  cached with `lru_cache`.
 - `choose_executable(name)` — native PATH → (Windows) WSL bridge `wsl.exe which`.
-- `tool_supported(name)` — báo cáo available/method (native|wsl|missing).
-- `executor.py` dùng `_shell_invocation()`: bash `--noprofile --norc` trên
-  Linux/macOS; WSL bridge, `powershell -NoProfile`, hoặc `cmd /d /s /c` trên
-  Windows. Chiến lược: python-portable > native PATH > pkg-manager > WSL2.
+- `tool_supported(name)` — reports availability/method (native|wsl|missing).
+- `executor.py` uses `_shell_invocation()`: bash `--noprofile --norc` on
+  Linux/macOS; WSL bridge, `powershell -NoProfile`, or `cmd /d /s /c` on Windows.
+  Strategy: python-portable > native PATH > pkg-manager > WSL2.
 
-## 4. MCP tools mới (19)
+## 4. New MCP tools (19)
 
 `app/tools/geo_tools.py` — `duachuot_geo_extract`, `duachuot_coord_convert`
 (DMS/decimal/UTM/**MGRS** input), `duachuot_geo_calc`, `duachuot_geo_reverse`,
-`duachuot_geo_verify` (≥2 fact độc lập → confidence; thiếu → BLOCKER),
+`duachuot_geo_verify` (≥2 independent facts → confidence; fewer → BLOCKER),
 `duachuot_geo_landmark_check`, `duachuot_timezone_at`.
 
 `app/tools/probes.py` — `duachuot_media_probe` (file+exiftool+ffprobe),
-`duachuot_pcap_probe` (tshark: conv/endpoints/DNS + GPS hints NMEA/Wi-Fi),
+`duachuot_pcap_probe` (tshark: conversations/endpoints/DNS + GPS hints NMEA/Wi-Fi),
 `duachuot_disk_probe` (fsstat+fls), `duachuot_mem_probe` (vol), `duachuot_stego_probe`
 (binwalk+steghide), `duachuot_ocr_probe` (tesseract+QR zxing), `duachuot_win_probe`
-(SAM/SYSTEM hive, LNK, prefetch — pure-Python).
+(SAM/SYSTEM hives, LNK, prefetch — pure-Python).
 
 `app/tools/ops_tools.py` — `duachuot_ops_check`, `duachuot_ops_jitter`,
-`duachuot_ops_redact`, `duachuot_platform`, `duachuot_plan` (kế hoạch điều tra
-theo loại artifact).
+`duachuot_ops_redact`, `duachuot_platform`, `duachuot_plan` (investigation plan by
+artifact type).
 
-Nguyên tắc probe: tool thiếu → lỗi BLOCKER rõ ràng với tên lệnh cần cài; không
-bao giờ đoán kết quả. Đăng ký trong `app/main.py`.
+Probe principle: missing tool → explicit BLOCKER error naming the command to install;
+results are never guessed. Registered in `app/main.py`.
 
 ## 5. CLI (`duachuot`)
 
@@ -85,9 +85,9 @@ duachuot ops jitter
 duachuot platform      [--tool NAME]
 ```
 
-Cài: `bin/duachuot` (venv-aware). Thêm vào PATH hoặc `scripts/install_cli.sh`.
+Install: `bin/duachuot` (venv-aware). Add to PATH or use `scripts/install_cli.sh`.
 
-## 6. Kiểm thử
+## 6. Testing
 
 ```bash
 .venv/bin/python -m pytest tests/ -q                 # 54 tests
@@ -95,9 +95,9 @@ Cài: `bin/duachuot` (venv-aware). Thêm vào PATH hoặc `scripts/install_cli.s
 .venv/bin/python scripts/install_datasets.py         # validate datasets (offline)
 ```
 
-## 7. Vận hành khi thi CTF
+## 7. CTF operations
 
-1. `duachuot platform --tool <tool>` — kiểm tra công cụ trước khi dùng.
-2. Mọi lệnh/target mạng → `duachuot_ops_check` trước; chờ jitter giữa các bước.
-3. Tọa độ: `geo_extract` → `coord_convert` → `geo_reverse` → `geo_verify` (≥2 fact).
-4. Log phải qua `ops_redact`; flag chỉ hiển thị cho người, không tự submit.
+1. `duachuot platform --tool <tool>` — check a tool before using it.
+2. Every command/network target → `duachuot_ops_check` first; wait for the jitter between steps.
+3. Coordinates: `geo_extract` → `coord_convert` → `geo_reverse` → `geo_verify` (≥2 facts).
+4. Logs go through `ops_redact`; flags are only shown to humans, never auto-submitted.

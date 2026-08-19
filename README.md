@@ -1,17 +1,17 @@
 # BotDuaChuot Host MCP
 
-MCP server tối giản để ChatGPT thao tác trực tiếp trên máy của bạn trong phạm vi `HOST_WORKSPACE_DIR`.
+A minimal MCP server that lets ChatGPT operate directly on your machine, scoped to `HOST_WORKSPACE_DIR`.
 
-Repo này chỉ còn hai chức năng chính:
+This repository has two main functions:
 
-1. Đọc, ghi, tìm kiếm file và chạy command trên host.
-2. Cung cấp hướng dẫn làm việc cùng danh mục tool thực tế có trong máy qua `duachuot_knowledge`.
+1. Read, write, search files and run commands on the host.
+2. Provide working guidance plus a real inventory of tools installed on the machine via `duachuot_knowledge`.
 
-## Cấu trúc
+## Layout
 
 ```text
 app/
-├── host/                 # Logic file, command, policy và tool inventory
+├── host/                 # File, command, policy and tool-inventory logic
 ├── geo/                  # Geo Engine (convert, geodesic, exif, reverse, timezone)
 ├── ops/                  # OPSEC gate
 ├── platform/             # OS/distro/arch/shell + tool resolution
@@ -49,17 +49,17 @@ scripts/
 └── test.sh
 ```
 
-## Cài đặt
+## Installation
 
-### 1. One-line Install (khuyên dùng)
+### 1. One-line install (recommended)
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/cornhub69-x/botduachuot_mcp/main/install.sh | bash
 ```
 
-Script mặc định clone nhánh `main` vào `~/.botduachuot_mcp`, tạo `.venv`, cài dependencies, tạo `.env` với quyền `600`, rồi liên kết CLI tại `~/.local/bin/duachuot`. Chạy lại cùng lệnh sẽ cập nhật installation bằng fast-forward; nếu working tree có file chưa commit, installer sẽ dừng để tránh ghi đè dữ liệu người dùng.
+By default the script clones the `main` branch into `~/.botduachuot_mcp`, creates a `.venv`, installs dependencies, creates a `.env` with `600` permissions, and links the CLI at `~/.local/bin/duachuot`. Re-running the same command updates the installation via fast-forward; if the working tree has uncommitted files, the installer stops to avoid overwriting user data.
 
-Có thể tùy chỉnh bằng biến môi trường:
+It can be customized with environment variables:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/cornhub69-x/botduachuot_mcp/main/install.sh | \
@@ -69,28 +69,28 @@ curl -fsSL https://raw.githubusercontent.com/cornhub69-x/botduachuot_mcp/main/in
   bash
 ```
 
-Các biến hỗ trợ: `BQA_REPO_URL`, `BQA_INSTALL_DIR`, `BQA_BIN_DIR`, `BQA_BRANCH`. `BQA_SKIP_PIP_UPGRADE=true` chỉ nên dùng trong môi trường kiểm thử hoặc offline đã chuẩn bị sẵn package cache.
+Supported variables: `BQA_REPO_URL`, `BQA_INSTALL_DIR`, `BQA_BIN_DIR`, `BQA_BRANCH`. `BQA_SKIP_PIP_UPGRADE=true` should only be used in test environments or offline setups with a prepared package cache.
 
-### 2. Cài đặt thủ công từ repository local
+### 2. Manual install from a local repository
 
 ```bash
 cd botduachuot_mcp
 ./install.sh
 ```
 
-`scripts/install_basic.sh` được giữ để tương thích và chuyển tiếp trực tiếp sang installer gốc.
+`scripts/install_basic.sh` is kept for compatibility and forwards directly to the main installer.
 
-### 3. Cấu hình và kiểm tra sau khi cài đặt
+### 3. Configuration and post-install checks
 
-Đảm bảo `~/.local/bin` có trong `PATH`:
+Make sure `~/.local/bin` is in your `PATH`:
 
 ```bash
 export PATH="$HOME/.local/bin:$PATH"
 ```
 
-Thêm dòng này vào `~/.bashrc` hoặc `~/.zshrc` để duy trì qua các session.
+Add this line to `~/.bashrc` or `~/.zshrc` to keep it across sessions.
 
-Cấu hình `.env` trước khi public service. Mặc định mẫu yêu cầu authentication:
+Configure `.env` before exposing the service. The default template requires authentication:
 
 ```env
 REQUIRE_AUTH=true
@@ -98,7 +98,7 @@ GATEWAY_TOKEN=<secret-random-token>
 HOST_WORKSPACE_DIR=/home/user
 ```
 
-Sau đó xác minh:
+Then verify:
 
 ```bash
 duachuot version
@@ -107,7 +107,7 @@ duachuot doctor
 ```
 
 
-## Chạy qua Cloudflare Tunnel
+## Running through Cloudflare Tunnel
 
 ```bash
 ./run_mcp_tunnel.sh
@@ -116,13 +116,13 @@ duachuot doctor
 ./run_mcp_tunnel.sh --stop
 ```
 
-URL connector có dạng:
+The connector URL looks like:
 
 ```text
 https://<random>.trycloudflare.com/mcp
 ```
 
-Streamable HTTP được cấu hình ở chế độ stateless và trả JSON trực tiếp. Mỗi request của ChatGPT hoạt động độc lập, không cần `mcp-session-id` và không giữ SSE stream cho các tool call thông thường.
+Streamable HTTP is configured stateless and returns JSON directly. Every ChatGPT request works independently: no `mcp-session-id` is required and no SSE stream is kept for regular tool calls.
 
 ```env
 MCP_JSON_RESPONSE=true
@@ -131,7 +131,7 @@ MCP_STATELESS_HTTP=true
 
 ## REST API
 
-REST API dùng chung host services với MCP và chạy trên cùng server/tunnel. Base path:
+The REST API shares the host services with the MCP server and runs on the same server/tunnel. Base path:
 
 ```text
 /api/v1
@@ -143,31 +143,31 @@ OpenAPI document:
 /api/v1/openapi.json
 ```
 
-Các endpoint chính:
+Main endpoints:
 
-| Method | Endpoint | Chức năng |
+| Method | Endpoint | Purpose |
 |---|---|---|
-| `GET` | `/api/v1/health` | Trạng thái server |
-| `GET` | `/api/v1/capabilities` | Tool, workspace và giới hạn |
-| `GET` | `/api/v1/files` | Liệt kê thư mục |
-| `GET` | `/api/v1/files/content` | Đọc file text |
-| `PUT` | `/api/v1/files/content` | Tạo hoặc ghi đè file |
-| `PATCH` | `/api/v1/files/content` | Thay thế text trong file |
-| `POST` | `/api/v1/files/append` | Nối nội dung vào file |
-| `POST` | `/api/v1/directories` | Tạo thư mục |
-| `GET` | `/api/v1/search` | Tìm text trong workspace |
-| `POST` | `/api/v1/commands/check` | Kiểm tra command |
-| `POST` | `/api/v1/commands/run` | Chạy command trên host |
-| `GET` | `/api/v1/knowledge` | Đọc guide và tool inventory |
+| `GET` | `/api/v1/health` | Server status |
+| `GET` | `/api/v1/capabilities` | Tools, workspace and limits |
+| `GET` | `/api/v1/files` | List directory |
+| `GET` | `/api/v1/files/content` | Read text file |
+| `PUT` | `/api/v1/files/content` | Create or overwrite file |
+| `PATCH` | `/api/v1/files/content` | Replace text in file |
+| `POST` | `/api/v1/files/append` | Append content to file |
+| `POST` | `/api/v1/directories` | Create directory |
+| `GET` | `/api/v1/search` | Search text in workspace |
+| `POST` | `/api/v1/commands/check` | Check a command |
+| `POST` | `/api/v1/commands/run` | Run a command on the host |
+| `GET` | `/api/v1/knowledge` | Read guides and tool inventory |
 
-Khi `REQUIRE_AUTH=true`, dùng một trong hai header:
+When `REQUIRE_AUTH=true`, use one of these headers:
 
 ```text
 Authorization: Bearer <GATEWAY_TOKEN>
 X-Gateway-Token: <GATEWAY_TOKEN>
 ```
 
-Ví dụ:
+Example:
 
 ```bash
 BASE_URL="https://<tunnel>.trycloudflare.com"
@@ -189,7 +189,7 @@ curl -X POST \
   "$BASE_URL/api/v1/commands/run"
 ```
 
-## Tool MCP
+## MCP tools
 
 ```text
 health_check
@@ -206,21 +206,21 @@ duachuot_run_command
 duachuot_knowledge
 ```
 
-`duachuot_run_command` không có tham số `approval="approved"`. Policy được quyết định hoàn toàn ở phía server.
+`duachuot_run_command` has no `approval="approved"` parameter. Policy is decided entirely server-side.
 
 ## Investigation tools (Forensics + OSINT + Geo)
 
-BotDuaChuot bổ sung 19 tool chuyên điều tra, chạy offline và deterministic:
+BotDuaChuot adds 19 dedicated investigation tools, fully offline and deterministic:
 
 ```text
-# Geo Engine (offline, không cần mạng)
-duachuot_geo_extract         # EXIF GPS, cross-check exiftool/exiv2, DOP/HPE, timezone, landmarks
+# Geo Engine (offline, no network required)
+duachuot_geo_extract         # EXIF GPS, exiftool/exiv2 cross-check, DOP/HPE, timezone, landmarks
 duachuot_coord_convert       # DMS/decimal/UTM/MGRS + datum transform (WGS84/ED50/NAD27)
-duachuot_geo_calc            # geodesic distance/bearing + uncertainty từ DOP/HPE
-duachuot_geo_reverse         # reverse geocoding offline (dataset landmarks.json)
-duachuot_geo_verify          # >= 2 fact độc lập mới kết luận; thiếu fact -> BLOCKER
-duachuot_geo_landmark_check  # kiểm tra bán kính quanh landmark
-duachuot_timezone_at         # timezone/UTC offset offline từ tọa độ
+duachuot_geo_calc            # geodesic distance/bearing + uncertainty from DOP/HPE
+duachuot_geo_reverse         # offline reverse geocoding (landmarks.json dataset)
+duachuot_geo_verify          # conclude only with >= 2 independent facts; fewer -> BLOCKER
+duachuot_geo_landmark_check  # radius check around a landmark
+duachuot_timezone_at         # offline timezone/UTC offset from coordinates
 
 # Probes
 duachuot_media_probe         # file + exiftool JSON + ffprobe
@@ -229,24 +229,24 @@ duachuot_disk_probe          # fsstat + fls
 duachuot_mem_probe           # Volatility 3 (info/pslist)
 duachuot_stego_probe         # binwalk + steghide
 duachuot_ocr_probe           # tesseract + QR (zxing-cpp)
-duachuot_win_probe           # SAM/SYSTEM hive, LNK, prefetch (pure-Python, chạy trên Linux/Windows)
+duachuot_win_probe           # SAM/SYSTEM hives, LNK, prefetch (pure-Python, Linux/Windows)
 
 # OPSEC + platform
-duachuot_ops_check           # chặn telemetry / attack tools / discovery khi ctf-live / flag trong lệnh
-duachuot_ops_jitter          # delay giả lập người giữa các truy vấn mạng
-duachuot_ops_redact          # redact secret/flag trước khi lưu log
-duachuot_platform            # probe OS/arch/distro/shell + khả năng tool (native/WSL/missing)
-duachuot_plan                # sinh kế hoạch điều tra theo loại artifact
+duachuot_ops_check           # blocks telemetry / attack tools / discovery while ctf-live / flags in commands
+duachuot_ops_jitter          # human-like delay between network queries
+duachuot_ops_redact          # redact secret/flag before writing logs
+duachuot_platform            # probe OS/arch/distro/shell + tool availability (native/WSL/missing)
+duachuot_plan                # generate an investigation plan by artifact type
 ```
 
-Playbook đầy đủ: `knowledge/GEO_PLAYBOOK.md`, `knowledge/FORENSICS_PLAYBOOK.md`, `knowledge/OSINT_PLAYBOOK.md`. Skill đi kèm: `skills/ctf-geo`, `skills/ctf-forensics-plus`, `skills/ctf-osint-plus`, `skills/ctf-stego-plus`.
+Full playbooks: `knowledge/GEO_PLAYBOOK.md`, `knowledge/FORENSICS_PLAYBOOK.md`, `knowledge/OSINT_PLAYBOOK.md`. Bundled skills: `skills/ctf-geo`, `skills/ctf-forensics-plus`, `skills/ctf-osint-plus`, `skills/ctf-stego-plus`.
 
-## OPSEC (bắt buộc khi thi CTF)
+## OPSEC (mandatory during CTF)
 
-- Mặc định `ctf-live`: cấm truy vấn nguồn công khai (sherlock/maigret/whois/dnsrecon/search engine), cấm tool tấn công tự động vào scope, cấm submit flag tự động — luôn qua người dùng.
-- Chế độ `investigation` (`OSINT_MODE=true`) mở các lookup OSINT đúng scope operator chỉ định.
-- Giữa các truy vấn mạng: chờ `duachuot_ops_jitter()` (800–3000 ms).
-- Mọi kết luận tọa độ cần >= 2 fact độc lập (kiểm qua `duachuot_geo_verify`).
+- Default `ctf-live`: no public-source lookups (sherlock/maigret/whois/dnsrecon/search engines), no automated attack tools against scope, no automatic flag submission — always through a human.
+- `investigation` mode (`OSINT_MODE=true`) opens OSINT lookups scoped to what the operator specifies.
+- Between network queries: wait for `duachuot_ops_jitter()` (800–3000 ms).
+- Every coordinate conclusion needs >= 2 independent facts (verified via `duachuot_geo_verify`).
 
 ## `duachuot_knowledge`
 
@@ -257,9 +257,9 @@ duachuot_knowledge(section="tools", query="python", include_versions=true)
 duachuot_knowledge(section="search", query="docker")
 ```
 
-Tool này đọc tài liệu trong `knowledge/` và đối chiếu `TOOL_CATALOG.json` với `PATH` thực tế của máy.
+This tool reads the documents in `knowledge/` and matches `TOOL_CATALOG.json` against the machine's actual `PATH`.
 
-## Kiểm thử
+## Testing
 
 ```bash
 ./scripts/test.sh
@@ -267,9 +267,9 @@ Tool này đọc tài liệu trong `knowledge/` và đối chiếu `TOOL_CATALOG
 ./scripts/manual_test_installer.sh
 ```
 
-`manual_test_installer.sh` dùng repository và HOME tạm trong `/tmp`; nó không khởi động, dừng hoặc restart Cloudflare tunnel thật.
+`manual_test_installer.sh` uses a temporary repository and HOME in `/tmp`; it never starts, stops or restarts a real Cloudflare tunnel.
 
-## Cấu hình quan trọng
+## Key configuration
 
 ```env
 HOST_WORKSPACE_DIR=/home/light
@@ -281,40 +281,40 @@ REQUIRE_AUTH=true
 GATEWAY_TOKEN=<secret>
 ```
 
-`guarded` chỉ là lớp bảo vệ khỏi các thao tác phá máy rõ ràng, không phải sandbox. MCP server chạy với quyền của user khởi động process.
+`guarded` is only a protection layer against obviously destructive operations, not a sandbox. The MCP server runs with the privileges of the user that starts the process.
 
-Xem thêm: `docs/ARCHITECTURE.md` và `SECURITY.md`.
+See also: `docs/ARCHITECTURE.md` and `SECURITY.md`.
 
 
-## CLI `duachuot`
+## `duachuot` CLI
 
-Repo có CLI thống nhất để vận hành bridge/tunnel và gọi REST API mà không cần viết `curl` thủ công.
+The repository ships a unified CLI to operate the bridge/tunnel and call the REST API without hand-writing `curl`.
 
-Cài editable entry point:
+Install the editable entry point:
 
 ```bash
 .venv/bin/python -m pip install -e . --no-deps
 ```
 
-Có thể chạy bằng một trong hai cách:
+Run it either way:
 
 ```bash
 ./bin/duachuot --help
 .venv/bin/duachuot --help
 ```
 
-Nhóm vận hành local:
+Local operations group:
 
 ```bash
 duachuot start
 duachuot status
 duachuot url
-duachuot server restart   # chỉ restart bridge, giữ nguyên tunnel URL
-duachuot restart --yes    # restart cả tunnel, có thể đổi URL
+duachuot server restart   # restart the bridge only, keep the tunnel URL
+duachuot restart --yes    # restart the tunnel too, URL may change
 duachuot stop
 ```
 
-Nhóm REST API:
+REST API group:
 
 ```bash
 duachuot health
@@ -330,7 +330,7 @@ duachuot cmd run 'git status --short' --cwd GitHub/botduachuot_mcp
 duachuot knowledge tools --query python --versions
 ```
 
-Các nhóm hỗ trợ vận hành:
+Operations support groups:
 
 ```bash
 duachuot logs server -n 100
@@ -341,38 +341,38 @@ duachuot doctor
 duachuot completion bash
 ```
 
-Mọi lệnh đều hỗ trợ `--json`. Global options có thể đặt trước hoặc sau subcommand:
+Every command supports `--json`. Global options can be placed before or after the subcommand:
 
 ```bash
 duachuot --public health --json
 duachuot health --public --json
 ```
 
-CLI mặc định gọi local REST tại `http://127.0.0.1:<MCP_PORT>`. Dùng `--public` để lấy URL hiện tại từ `logs/tunnel_url.txt`, hoặc `--base-url` để chỉ định endpoint khác.
+By default the CLI calls the local REST endpoint at `http://127.0.0.1:<MCP_PORT>`. Use `--public` to take the current URL from `logs/tunnel_url.txt`, or `--base-url` to point at another endpoint.
 
-Exit code chính:
+Main exit codes:
 
 ```text
-0  thành công
-1  operation thất bại
-2  sai tham số
-3  không kết nối được server
-4  authentication thất bại
-5  policy chặn
-6  resource không tồn tại
+0  success
+1  operation failed
+2  invalid arguments
+3  cannot reach the server
+4  authentication failed
+5  blocked by policy
+6  resource not found
 7  timeout
 8  conflict
 ```
 
-Riêng `duachuot cmd run`, khi server đã thực thi command thành công về mặt request, exit code CLI sẽ phản ánh exit code thật của command.
+For `duachuot cmd run`, when the server executed the command successfully at the request level, the CLI exit code mirrors the real exit code of the command.
 
-Thiết kế đầy đủ: `docs/CLI_DESIGN_PLAN.md`.
+Full design: `docs/CLI_DESIGN_PLAN.md`.
 
-Tài liệu CLI bổ sung: `docs/CLI_MANUAL_TEST_PLAN.md` và `docs/CLI_IMPLEMENTATION_REPORT.md`.
+Additional CLI docs: `docs/CLI_MANUAL_TEST_PLAN.md` and `docs/CLI_IMPLEMENTATION_REPORT.md`.
 
-## Vận hành và recovery
+## Operations and recovery
 
-Quality gate thống nhất:
+Unified quality gate:
 
 ```bash
 ./scripts/quality_gate.sh
@@ -380,7 +380,7 @@ Quality gate thống nhất:
 ./scripts/quality_gate.sh --full
 ```
 
-Doctor và config nghiêm ngặt:
+Strict doctor and config:
 
 ```bash
 duachuot doctor --local-only
@@ -388,19 +388,19 @@ duachuot doctor --strict
 duachuot config validate --strict
 ```
 
-Thu thập diagnostics đã che cấu hình nhạy cảm:
+Collect diagnostics with sensitive configuration redacted:
 
 ```bash
 ./scripts/collect_diagnostics.sh
 ```
 
-Quy trình cài đặt, restart bridge không đổi tunnel, recovery, rollback và checklist production được mô tả tại `docs/OPERATIONS_RUNBOOK.md`.
+Installation, bridge-only restart (keeping the tunnel), recovery, rollback and the production checklist are described in `docs/OPERATIONS_RUNBOOK.md`.
 
-## Kiến trúc, bảo mật và release
+## Architecture, security and releases
 
-- Kiến trúc runtime và boundary: `docs/ARCHITECTURE.md`
-- Mô hình bảo mật và hardening: `SECURITY.md`
-- Vận hành, recovery và rollback: `docs/OPERATIONS_RUNBOOK.md`
-- Checklist release: `docs/RELEASE_CHECKLIST.md`
+- Runtime architecture and boundaries: `docs/ARCHITECTURE.md`
+- Security model and hardening: `SECURITY.md`
+- Operations, recovery and rollback: `docs/OPERATIONS_RUNBOOK.md`
+- Release checklist: `docs/RELEASE_CHECKLIST.md`
 
-GitHub Actions chạy quality gate trên push và pull request; Dependabot theo dõi Python và GitHub Actions dependencies.
+GitHub Actions runs the quality gate on push and pull request; Dependabot tracks Python and GitHub Actions dependencies.

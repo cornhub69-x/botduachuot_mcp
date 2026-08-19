@@ -1,42 +1,42 @@
 # Geo Playbook — BotDuaChuot
 
-Chuẩn cho mọi bài toán **tọa độ / vị trí** trong CTF. Mục tiêu: tìm tọa độ chính xác, chứng minh bằng >= 2 fact độc lập, offline và deterministic.
+Standard playbook for every **coordinate / location** task in CTF. Goal: find precise coordinates, prove them with >= 2 independent facts, fully offline and deterministic.
 
-## Pipeline (8 bước chuẩn)
+## Pipeline (8 standard steps)
 
-1. **Triage artifact** — `duachuot_media_probe` (hoặc `file` + `exiftool -json -n`). Xác định loại file, nguồn metadata.
-2. **Trích xuất GPS** — `duachuot_geo_extract(path, cross_check=True)`. exiftool là primary, exiv2 là cross-check. **Nếu 2 nguồn bất đồng → trả về None + cảnh báo; không bao giờ merge yên lặng.**
-3. **Convert** — `duachuot_coord_convert` với mọi dạng tọa độ gặp trong challenge:
-   - DMS: `21°01'44.6"N 105°51'13.2"E` (chú ý N/S/E/W)
+1. **Triage the artifact** — `duachuot_media_probe` (or `file` + `exiftool -json -n`). Identify the file type and metadata source.
+2. **Extract GPS** — `duachuot_geo_extract(path, cross_check=True)`. exiftool is the primary source, exiv2 the cross-check. **If the two sources disagree → return None + warning; never merge silently.**
+3. **Convert** — `duachuot_coord_convert` for every coordinate form seen in the challenge:
+   - DMS: `21°01'44.6"N 105°51'13.2"E` (mind N/S/E/W)
    - Decimal: `21.02906, 105.85367`
-   - UTM: zone + hemisphere + easting/northing (ED50/NAD27/WGS84 khác nhau tới 100-500 m!)
-   - MGRS: `48Q UJ 12345 67890` (chuẩn NGA: zone lẻ dùng set cột 8 ký tự, zone chẵn dùng set hàng 20 ký tự)
-4. **Reverse offline** — `duachuot_geo_reverse` với dataset landmarks.json. Luôn note đây là offline estimate, không phải GPS thật.
-5. **Verify** — `duachuot_geo_verify`: cần >= 2 fact độc lập (landmark gần, timezone khớp, heading khớp, EXIF). < 2 → **BLOCKER**, không được kết luận.
-6. **Cross-check time** — `duachuot_timezone_at` so với GPSDateTime trong EXIF (UTC → local).
-7. **Cross-check heading** — bearing từ điểm chụp tới landmark vs GPSImgDirection.
-8. **Báo cáo** — ghi fact/inference rõ ràng, kèm accuracy (HPE/DOP), dẫn nguồn từng value.
+   - UTM: zone + hemisphere + easting/northing (ED50/NAD27/WGS84 differ by 100-500 m!)
+   - MGRS: `48Q UJ 12345 67890` (NGA standard: odd zones use the 8-letter column set first, even zones the 20-letter row set first)
+4. **Offline reverse** — `duachuot_geo_reverse` against the bundled landmarks.json dataset. Always note this is an offline estimate, not a real GPS fix.
+5. **Verify** — `duachuot_geo_verify`: needs >= 2 independent facts (nearby landmark, matching timezone, matching heading, EXIF). Fewer → **BLOCKER**, do not conclude.
+6. **Cross-check time** — `duachuot_timezone_at` vs the EXIF GPSDateTime (UTC → local).
+7. **Cross-check heading** — bearing from the capture point to a landmark vs GPSImgDirection.
+8. **Report** — record fact/inference clearly with accuracy (HPE/DOP) and source for every value.
 
-## Nguyên tắc
+## Principles
 
-- **Offline tuyệt đối**: không dùng reverse-geocoding online (Google/OSM API) khi đang live. Nếu dataset thiếu landmark, ghi BLOCKER.
-- **Round-trip byte-for-byte**: mọi convert phải qua lại đúng; test round-trip là bắt buộc trước khi tin một kết quả.
-- **Datum là bẫy kinh điển**: bài hay cho UTM/ED50 hoặc "Lat: 21 01 44.6 N". Luôn thử cả 3 datum khi kết quả không khớp landmark.
-- **Accuracy đi kèm mọi kết luận**: luôn output bán kính sai số (DOP*HPE hoặc ước lượng).
+- **Strictly offline**: no online reverse geocoding (Google/OSM APIs) while live. If a landmark is missing from the dataset, record a BLOCKER.
+- **Byte-for-byte round-trip**: every conversion must round-trip exactly; run round-trip tests before trusting any result.
+- **Datum is the classic trap**: challenges often provide UTM/ED50 or "Lat: 21 01 44.6 N". Always try all 3 datums when a result does not match a landmark.
+- **Every conclusion carries accuracy**: always output the error radius (DOP*HPE or an estimate).
 
-## Bẫy thường gặp
+## Common traps
 
-| Bẫy | Dấu hiệu | Xử lý |
+| Trap | Signal | Handling |
 |---|---|---|
-| Lat/Lon đảo | landmark cách xa | thử đảo trục |
-| DMS thiếu dấu phút/giây | "21 01 44.6" | parse decimal thuần |
-| MGRS zone chẵn/lẻ | square không hợp lệ | dùng bảng NGA đúng |
-| Datum ED50/NAD27 | lệch 100-500 m đều | transform → WGS84 |
-| GPSDateTime local vs UTC | timezone không khớp | thử offset 7/8 giờ |
+| Lat/Lon swapped | landmark far away | try swapped axes |
+| DMS without minute/second marks | "21 01 44.6" | parse as plain decimal |
+| Wrong MGRS zone parity | invalid square | use the correct NGA tables |
+| ED50/NAD27 datum | consistent 100-500 m offset | transform → WGS84 |
+| GPSDateTime local vs UTC | timezone mismatch | try 7/8 h offsets |
 
-## Fact ghi nhận
+## Evidence recording
 
-- FACT: giá trị trích xuất được + nguồn (exiftool/exiv2/nơi đọc).
-- INFERENCE: suy luận có dẫn chứng (bearing + heading → hướng chụp).
-- HYPOTHESIS: giả thuyết chưa đủ fact (cần bước verify).
-- BLOCKER: không đủ fact độc lập → không kết luận, báo thiếu gì.
+- FACT: an extracted value + source (exiftool/exiv2/where read).
+- INFERENCE: a derivation with support (bearing + heading → shot direction).
+- HYPOTHESIS: not enough facts yet (needs the verify step).
+- BLOCKER: insufficient independent facts → do not conclude; state what is missing.

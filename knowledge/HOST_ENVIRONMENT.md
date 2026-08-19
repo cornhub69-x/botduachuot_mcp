@@ -2,25 +2,25 @@
 
 ## Runtime
 
-- MCP server chạy trực tiếp bằng user đã khởi động process.
-- File và command được giới hạn bởi `HOST_WORKSPACE_DIR`.
-- `HOST_RESTRICT_TO_WORKSPACE=true` nên được giữ mặc định.
-- `HOST_COMMAND_POLICY=guarded` chặn các thao tác phá máy hoặc nâng quyền rõ ràng.
-- Đây không phải sandbox; command hợp lệ vẫn có quyền của user chạy server.
+- The MCP server runs directly with the user account that started the process.
+- Files and commands are scoped by `HOST_WORKSPACE_DIR`.
+- `HOST_RESTRICT_TO_WORKSPACE=true` should stay the default.
+- `HOST_COMMAND_POLICY=guarded` blocks obviously destructive or privilege-escalating operations.
+- This is not a sandbox; valid commands run with the privileges of the user that runs the server.
 
 ## Tool discovery
 
-`host_knowledge` đối chiếu `TOOL_CATALOG.json` với `PATH` thực tế của process MCP.
+`duachuot_knowledge` matches `TOOL_CATALOG.json` against the actual `PATH` of the MCP process.
 
-- `available=true` nghĩa là command được tìm thấy trong `PATH`.
-- Version chỉ được probe bằng argument cố định khai báo trong catalog.
-- Dùng `refresh=true` để bỏ cache và kiểm tra lại.
+- `available=true` means the command was found in `PATH`.
+- Versions are only probed with fixed arguments declared in the catalog.
+- Use `refresh=true` to drop the cache and re-check.
 
-## Workspace hiện tại
+## Current workspace
 
-Kiểm tra cấu hình thực tế bằng:
+Check the actual configuration with:
 
 ```text
-host_knowledge(section="overview")
-get_capabilities
+duachuot_knowledge(section="overview")
+duachuot_get_capabilities
 ```

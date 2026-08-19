@@ -1,53 +1,53 @@
 # Forensics Playbook — BotDuaChuot
 
-Chuẩn cho bài **forensics** (media, pcap, disk, memory, stego, windows artifacts). Evidence-first: chỉ kết luận khi có >= 2 fact độc lập hoặc 1 fact + chuỗi suy luận rõ.
+Standard playbook for **forensics** tasks (media, pcap, disk, memory, stego, Windows artifacts). Evidence-first: only conclude with >= 2 independent facts, or 1 fact plus a clear chain of reasoning.
 
-## Pipeline theo loại artifact
+## Pipeline by artifact type
 
-### Media (ảnh/video)
+### Media (image/video)
 1. `duachuot_media_probe` — file + exiftool JSON + ffprobe streams.
-2. `duachuot_geo_extract` nếu có GPS; else kiểm tra: thumbnail, comment, XPComment, Creator, Software, timestamps (GPSDateTime/ModifyDate khác nhau → travel hint).
-3. `duachuot_stego_probe` — binwalk + steghide info (payload có thể chứa tọa độ/flag).
-4. `duachuot_ocr_probe` — tesseract text + QR (zxing-cpp) — QR thường chứa coord.
-5. Nghi ngờ LSB: zsteg, thử các plane (stegsolve).
+2. `duachuot_geo_extract` if GPS exists; otherwise check: thumbnail, comment, XPComment, Creator, Software, timestamps (GPSDateTime vs ModifyDate mismatch → travel hint).
+3. `duachuot_stego_probe` — binwalk + steghide info (payload may hold coordinates/flag).
+4. `duachuot_ocr_probe` — tesseract text + QR (zxing-cpp) — QR codes often carry coordinates.
+5. If LSB is suspected: zsteg, try each plane (stegsolve).
 
 ### PCAP
 1. `duachuot_pcap_probe` — conversations, endpoints, DNS queries.
-2. Geo hints: Wi-Fi probe requests (SSID/AP MAC → landmark), GPS NMEA (`$GPRMC`/`$GPGGA` trong data), cellular/Bluetooth.
-3. Lọc flag: `tshark -Y` + strings; tải file theo dòng (HTTP) để inspect.
-4. Nếu flow SSH/TLS với cert: extract cert (CN/SAN có thể là domain hint).
+2. Geo hints: Wi-Fi probe requests (SSID/AP MAC → landmark), GPS NMEA (`$GPRMC`/`$GPGGA` in payloads), cellular/Bluetooth.
+3. Flag hunting: `tshark -Y` + strings; follow HTTP streams to inspect files.
+4. If SSH/TLS flows carry certs: extract cert (CN/SAN can be a domain hint).
 
 ### Disk image
-1. `duachuot_disk_probe` — file → fsstat (type/version) → fls -r (cây file, deleted files có `*`).
-2. Quan sát: user profile, desktop, documents, bash history, browser history, recent files.
-3. Carve: binwalk / foremost vào scratch dir (không bao giờ ghi lên bản gốc).
-4. Passwords/hint: strings trên các file nghi vấn.
+1. `duachuot_disk_probe` — file → fsstat (type/version) → fls -r (file tree; deleted files marked `*`).
+2. Look for: user profiles, desktop, documents, bash history, browser history, recent files.
+3. Carve: binwalk / foremost into a scratch dir (never on the original).
+4. Passwords/hints: strings on suspect files.
 
 ### Memory
-1. `duachuot_mem_probe` — info (profile) → pslist → filescan theo evidence.
-2. Tìm: clipboard, network connections (netstat), dumps văn bản, process với tên lạ, env/command line.
-3. Cảnh báo: không nhảy tới plugin mà profile chưa chứng minh.
+1. `duachuot_mem_probe` — info (profile) → pslist → filescan per evidence.
+2. Look for: clipboard, network connections (netstat), text dumps, processes with odd names, env/command lines.
+3. Warning: never jump to a plugin whose profile is not yet evidenced.
 
 ### Stego
-1. Signature scan (binwalk), steghide info, zsteg cho LSB.
-2. Nếu cần passphrase: chú ý hint trong tên file, metadata, nội dung bài.
-3. **Không brute-force trên scope** (OPSEC rule 4).
+1. Signature scan (binwalk), steghide info, zsteg for LSB.
+2. If a passphrase is needed: watch for hints in the filename, metadata, challenge description.
+3. **No brute force on scope** (OPSEC rule 4).
 
-### Windows artifacts (khi không có Windows host)
+### Windows artifacts (when no Windows host is available)
 1. `duachuot_win_probe` — SAM/SYSTEM hive strings, LNK target strings, prefetch.
-2. Kiểm tra RecentDocs, user.config, bộ office recent.
+2. Check RecentDocs, user.config, MS Office recent files.
 
-## Nguyên tắc
+## Principles
 
-- **Preserve original**: mọi phân tích/output vào `/tmp` hoặc derived dir; đọc gốc read-only.
-- **Carve vào scratch**: foremost/binwalk output ở thư mục riêng.
-- **Tool thiếu ≠ suy luận**: nếu `tshark`/`vol` thiếu → trả về BLOCKER rõ, không đoán kết quả.
-- **Version thật trên wire**: nếu challenge hỏi version tool, chạy version_args thật, không tự khai.
-- **Evidence chain**: ghi file nguồn + command + output excerpt cho mọi fact.
+- **Preserve the original**: all analysis/output to `/tmp` or a derived dir; read the original read-only.
+- **Carve into scratch**: foremost/binwalk output goes to its own directory.
+- **Missing tool ≠ speculation**: if `tshark`/`vol` is missing → return a clear BLOCKER, never guess results.
+- **True versions on the wire**: if the challenge asks for a tool version, run the real version argument, do not invent one.
+- **Evidence chain**: record file source + command + output excerpt for every fact.
 
-## Fact ghi nhận
+## Evidence recording
 
-- FACT: giá trị + nguồn (tool, offset, file).
-- INFERENCE: suy luận có dẫn chứng.
-- HYPOTHESIS: chưa đủ fact → chờ bước tiếp theo.
-- BLOCKER: thiếu công cụ/dữ liệu không thể tiếp tục → báo cụ thể thiếu gì.
+- FACT: value + source (tool, offset, file).
+- INFERENCE: derivation with support.
+- HYPOTHESIS: not enough facts → wait for the next step.
+- BLOCKER: missing tool/data that blocks progress → state exactly what is missing.

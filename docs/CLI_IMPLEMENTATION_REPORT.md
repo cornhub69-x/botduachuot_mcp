@@ -1,10 +1,10 @@
 # CLI Implementation Report
 
-## Tổng quan
+## Overview
 
-CLI `bqa` đã được triển khai đầy đủ cho repo `botquanganh_mcp` theo kế hoạch Phase 1–5.
+The `duachuot` CLI has been fully implemented for the `botduachuot_mcp` repository following the Phase 1–5 plan.
 
-Ngày hoàn tất: 20/07/2026.
+Completion date: 2026-07-20.
 
 Branch:
 
@@ -12,7 +12,7 @@ Branch:
 refactor/host-core-clean-v1
 ```
 
-## Cấu trúc được thêm
+## Added structure
 
 ```text
 app/cli/
@@ -37,7 +37,7 @@ app/cli/
     └── completion.py
 
 bin/
-└── bqa
+└── duachuot
 
 pyproject.toml
 scripts/manual_test_cli.sh
@@ -47,7 +47,7 @@ docs/CLI_MANUAL_TEST_PLAN.md
 ## Command tree
 
 ```text
-bqa
+duachuot
 ├── start
 ├── stop
 ├── restart
@@ -82,35 +82,35 @@ bqa
 └── version
 ```
 
-## Kiến trúc
+## Architecture
 
 ### Local operations
 
-Các lệnh lifecycle chỉ wrap script chính thức:
+Lifecycle commands only wrap the official scripts:
 
 ```text
 run_mcp_tunnel.sh
 scripts/restart_server_only.sh
 ```
 
-CLI không copy lại logic quản lý process.
+The CLI does not re-implement process management.
 
 ### API operations
 
-Các lệnh filesystem, command, knowledge, health và capabilities gọi REST API hiện có.
+Filesystem, command, knowledge, health and capabilities commands call the existing REST API.
 
-CLI không triển khai lại:
+The CLI does not re-implement:
 
-- path boundary;
+- path boundaries;
 - command policy;
-- file service;
-- command executor;
-- knowledge inventory;
+- the file service;
+- the command executor;
+- the knowledge inventory;
 - authentication.
 
 ### HTTP client
 
-REST client sử dụng `urllib.request` trong standard library và hỗ trợ:
+The REST client uses `urllib.request` from the standard library and supports:
 
 - local URL;
 - canonical public tunnel URL;
@@ -119,27 +119,27 @@ REST client sử dụng `urllib.request` trong standard library và hỗ trợ:
 - request timeout;
 - JSON encode/decode;
 - HTTP error mapping;
-- command failure payload dù REST trả HTTP 500.
+- command failure payloads even when REST returns HTTP 500.
 
 ## Exit-code semantics
 
 ```text
-0  Thành công
-1  Operation thất bại
-2  Sai tham số
-3  Không kết nối được server
-4  Authentication thất bại
-5  Policy chặn
-6  Resource không tồn tại
+0  Success
+1  Operation failed
+2  Invalid arguments
+3  Cannot reach the server
+4  Authentication failed
+5  Blocked by policy
+6  Resource not found
 7  Timeout
 8  Conflict
 ```
 
-`bqa cmd run` giữ nguyên exit code thật của command khi request đã được server xử lý.
+`duachuot cmd run` preserves the real exit code of the command when the request was handled by the server.
 
 ## Packaging
 
-Đã thêm:
+Added:
 
 ```text
 pyproject.toml
@@ -149,35 +149,35 @@ Console entry point:
 
 ```toml
 [project.scripts]
-bqa = "app.cli.main:main"
+duachuot = "app.cli.main:main"
 ```
 
-Đã xác minh:
+Verified:
 
 ```text
-.venv/bin/bqa version
-bqa 1.0.0
+.venv/bin/duachuot version
+duachuot 1.0.0
 ```
 
-`install_basic.sh` hiện cài dependency rồi chạy editable install để tạo entry point.
+`install_basic.sh` now installs dependencies and runs the editable install to create the entry point.
 
 ## Automated tests
 
-Kết quả cuối:
+Final result:
 
 ```text
 37 passed in 8.44s
 ```
 
-Bao gồm test cũ và các nhóm test mới:
+Includes the legacy tests and the new groups:
 
 - parser;
 - global option normalization;
 - line ranges;
-- output và secret redaction;
+- output and secret redaction;
 - REST client;
 - auth/error mapping;
-- command non-zero semantics;
+- non-zero command semantics;
 - lifecycle helpers;
 - CLI integration.
 
@@ -189,37 +189,37 @@ Script:
 scripts/manual_test_cli.sh
 ```
 
-Kết quả cuối:
+Final result:
 
 ```text
 TOTAL_PASS=18
 ALL_CLI_MANUAL_TESTS=PASS
 ```
 
-Các nhóm đã pass:
+Groups that passed:
 
 1. Build, executable, packaging, help, version.
-2. Bash, Zsh và Fish completion.
-3. Status, JSON và global option placement.
+2. Bash, Zsh and Fish completion.
+3. Status, JSON and global option placement.
 4. Local/public REST health.
-5. Capabilities và filters.
+5. Capabilities and filters.
 6. Filesystem write sources.
 7. File line ranges.
-8. Append, replace, search, list và conflict.
+8. Append, replace, search, list and conflict.
 9. Command policy.
 10. Command execution semantics.
 11. Knowledge sections.
-12. Logs, grep, since và follow.
-13. Config và token redaction.
-14. Doctor local/public REST và MCP initialize.
-15. Lifecycle cô lập.
+12. Logs, grep, since and follow.
+13. Config and token redaction.
+14. Doctor local/public REST and MCP initialize.
+15. Isolated lifecycle.
 16. Live idempotent start.
 17. Live server-only restart.
-18. Pytest, compileall, Bash syntax và Git diff check.
+18. Pytest, compileall, Bash syntax and Git diff check.
 
-## Lifecycle cô lập
+## Isolated lifecycle
 
-Full lifecycle được kiểm tra trong repo giả với environment sạch:
+The full lifecycle was tested in a fake repository with a clean environment:
 
 ```text
 ISOLATED_STATUS:
@@ -229,28 +229,28 @@ url=https://isolated-1.trycloudflare.com/mcp
 workspace=/tmp/.../isolated-repo
 ```
 
-Đã xác minh:
+Verified:
 
 - start;
-- start idempotent;
+- idempotent start;
 - status;
 - server-only restart;
 - stop;
 - restart confirmation;
 - full restart;
-- URL mới sau full restart;
-- không có process hồi sinh sau stop.
+- new URL after full restart;
+- no resurrected processes after stop.
 
-## Runtime thật
+## Real runtime
 
-Trước regression cuối:
+Before the final regression:
 
 ```text
 Tunnel PID: 65323
 URL: https://cambridge-plays-jessica-albums.trycloudflare.com/mcp
 ```
 
-Sau `bqa server restart`:
+After `duachuot server restart`:
 
 ```text
 Supervisor: running (65413)
@@ -260,37 +260,37 @@ Bridge:     ready
 URL:        https://cambridge-plays-jessica-albums.trycloudflare.com/mcp
 ```
 
-Kết luận:
+Conclusion:
 
-- server PID thay đổi;
-- tunnel PID không đổi;
-- URL không đổi;
+- server PID changed;
+- tunnel PID unchanged;
+- URL unchanged;
 - local health pass;
 - public REST pass;
 - public MCP initialize pass.
 
-Full tunnel restart không được chạy trên runtime thật.
+A full tunnel restart was not run against the real runtime.
 
 ## Security behavior
 
-Runtime hiện vẫn giữ:
+The runtime keeps:
 
 ```text
 REQUIRE_AUTH=false
 ```
 
-Theo yêu cầu của người dùng, CLI không thay đổi cấu hình này.
+As requested by the user, the CLI does not change this setting.
 
-CLI vẫn hỗ trợ token khi auth được bật sau này và luôn che secret trong:
+The CLI still supports tokens when auth is enabled later and always masks secrets in:
 
 - `config show`;
 - `config get`;
 - JSON output;
 - error details.
 
-## Tài liệu
+## Documentation
 
-- `README.md` có phần hướng dẫn CLI.
-- `docs/CLI_DESIGN_PLAN.md` có thiết kế và trạng thái triển khai.
-- `docs/CLI_MANUAL_TEST_PLAN.md` có ma trận regression.
-- File này ghi nhận kết quả triển khai và nghiệm thu.
+- `README.md` has a CLI usage section.
+- `docs/CLI_DESIGN_PLAN.md` has the design and implementation status.
+- `docs/CLI_MANUAL_TEST_PLAN.md` has the regression matrix.
+- This file records the implementation and acceptance results.
