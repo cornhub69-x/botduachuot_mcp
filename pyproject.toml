@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "botduachuot-host-mcp"
 version = "1.0.0"
-description = "Host MCP server and bqa operations CLI"
+description = "Host MCP server and duachuot operations CLI"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
@@ -17,7 +17,7 @@ dependencies = [
 test = ["pytest==9.1.1"]
 
 [project.scripts]
-bqa = "app.cli.main:main"
+duachuot = "app.cli.main:main"
 
 [tool.setuptools.packages.find]
 where = ["."]

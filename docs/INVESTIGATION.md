@@ -54,7 +54,7 @@ Default mode is `ctf-live` from `app.config.OSINT_MODE` (False). Set
   Linux/macOS; WSL bridge, `powershell -NoProfile`, or `cmd /d /s /c` on Windows.
   Strategy: python-portable > native PATH > pkg-manager > WSL2.
 
-## 4. New MCP tools (19)
+## 4. New MCP tools (20)
 
 `app/tools/geo_tools.py` — `duachuot_geo_extract`, `duachuot_coord_convert`
 (DMS/decimal/UTM/**MGRS** input), `duachuot_geo_calc`, `duachuot_geo_reverse`,
@@ -69,7 +69,12 @@ Default mode is `ctf-live` from `app.config.OSINT_MODE` (False). Set
 
 `app/tools/ops_tools.py` — `duachuot_ops_check`, `duachuot_ops_jitter`,
 `duachuot_ops_redact`, `duachuot_platform`, `duachuot_plan` (investigation plan by
-artifact type).
+artifact type), `duachuot_resource_lookup` (ctf-tools Resource Registry).
+
+Resource Registry (`app/resources.py` + `resources/RESOURCE_MAP.json`, generated
+by `scripts/generate_resource_map.py`): a managed index of the host ctf-tools
+repository (skills, scripts, tools, bin entries, notes) with path, category,
+invoke template, and availability. Missing resource → BLOCKER.
 
 Probe principle: missing tool → explicit BLOCKER error naming the command to install;
 results are never guessed. Registered in `app/main.py`.

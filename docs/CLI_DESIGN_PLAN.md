@@ -610,7 +610,7 @@ Token resolution order:
 
 1. `--token`.
 2. `--token-file`.
-3. `BQA_TOKEN`.
+3. `DUACHUOT_TOKEN`.
 4. `GATEWAY_TOKEN` in the environment.
 5. The repository `.env`.
 

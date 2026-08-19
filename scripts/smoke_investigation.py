@@ -53,7 +53,7 @@ async def main() -> int:
     if failed:
         print(f"FAIL checks: {failed}")
         return 1
-    print("SMOKE OK: 31 tools registered, 7 functional checks passed")
+    print(f"SMOKE OK: {len(tools)} tools registered, 7 functional checks passed")
     return 0
 
 

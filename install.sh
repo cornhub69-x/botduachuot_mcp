@@ -16,15 +16,15 @@ if [ -n "${BASH_SOURCE[0]:-}" ] && [ -f "${BASH_SOURCE[0]}" ]; then
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 fi
 
-if [ -n "$SCRIPT_DIR" ] && [ -f "$SCRIPT_DIR/pyproject.toml" ] && [ -f "$SCRIPT_DIR/bin/bqa" ]; then
+if [ -n "$SCRIPT_DIR" ] && [ -f "$SCRIPT_DIR/pyproject.toml" ] && [ -f "$SCRIPT_DIR/bin/duachuot" ]; then
     ROOT_DIR="$SCRIPT_DIR"
-elif [ -f "$PWD/pyproject.toml" ] && [ -f "$PWD/bin/bqa" ]; then
+elif [ -f "$PWD/pyproject.toml" ] && [ -f "$PWD/bin/duachuot" ]; then
     # Supports: cat install.sh | bash while the shell is inside the repository.
     ROOT_DIR="$PWD"
 else
-    TARGET_REPO_URL="${BQA_REPO_URL:-https://github.com/cornhub69-x/botduachuot_mcp.git}"
-    TARGET_INSTALL_DIR="${BQA_INSTALL_DIR:-$HOME/.botduachuot_mcp}"
-    TARGET_BRANCH="${BQA_BRANCH:-main}"
+    TARGET_REPO_URL="${DUACHUOT_REPO_URL:-https://github.com/cornhub69-x/botduachuot_mcp.git}"
+    TARGET_INSTALL_DIR="${DUACHUOT_INSTALL_DIR:-$HOME/.botduachuot_mcp}"
+    TARGET_BRANCH="${DUACHUOT_BRANCH:-main}"
 
     command -v git >/dev/null 2>&1 || fail "git is required for remote installation."
     git ls-remote --exit-code --heads "$TARGET_REPO_URL" "$TARGET_BRANCH" >/dev/null 2>&1 \
@@ -62,7 +62,7 @@ else
 fi
 
 cd "$ROOT_DIR"
-[ -f pyproject.toml ] && [ -f bin/bqa ] || fail "$ROOT_DIR is not a valid BotDuaChuot MCP repository."
+[ -f pyproject.toml ] && [ -f bin/duachuot ] || fail "$ROOT_DIR is not a valid BotDuaChuot MCP repository."
 echo "[*] Repository location: $ROOT_DIR"
 
 PYTHON_BIN="$(command -v python3 || true)"
@@ -77,7 +77,7 @@ VENV_PYTHON="$ROOT_DIR/.venv/bin/python"
 [ -x "$VENV_PYTHON" ] \
     || fail "virtual environment Python at $VENV_PYTHON is missing or not executable."
 
-if [ "${BQA_SKIP_PIP_UPGRADE:-false}" != "true" ]; then
+if [ "${DUACHUOT_SKIP_PIP_UPGRADE:-false}" != "true" ]; then
     echo "[*] Updating pip..."
     "$VENV_PYTHON" -m pip install --upgrade pip --quiet
 fi
@@ -87,7 +87,7 @@ if [ -f requirements.txt ]; then
     "$VENV_PYTHON" -m pip install -r requirements.txt --quiet
 fi
 
-echo "[*] Installing bqa CLI package..."
+echo "[*] Installing duachuot CLI package..."
 "$VENV_PYTHON" -m pip install -e . --no-deps --quiet
 
 if [ ! -f .env ] && [ -f .env.example ]; then
@@ -99,11 +99,11 @@ if [ -f .env ]; then
 fi
 
 mkdir -p logs
-chmod +x install.sh bin/bqa scripts/*.sh
+chmod +x install.sh bin/duachuot scripts/*.sh
 
-TARGET_DIR="${BQA_BIN_DIR:-$HOME/.local/bin}"
-TARGET_LINK="$TARGET_DIR/bqa"
-SOURCE_BIN="$ROOT_DIR/bin/bqa"
+TARGET_DIR="${DUACHUOT_BIN_DIR:-$HOME/.local/bin}"
+TARGET_LINK="$TARGET_DIR/duachuot"
+SOURCE_BIN="$ROOT_DIR/bin/duachuot"
 [ -x "$SOURCE_BIN" ] || fail "CLI executable $SOURCE_BIN was not found."
 
 mkdir -p "$TARGET_DIR"
@@ -138,7 +138,7 @@ esac
 
 echo "Quick Start Steps:"
 echo "  1. Configure .env (set GATEWAY_TOKEN and HOST_WORKSPACE_DIR)"
-echo "  2. Run 'bqa config validate'"
-echo "  3. Run 'bqa doctor'"
-echo "  4. Run 'bqa start' when you are ready to launch the service"
+echo "  2. Run 'duachuot config validate'"
+echo "  3. Run 'duachuot doctor'"
+echo "  4. Run 'duachuot start' when you are ready to launch the service"
 echo ""

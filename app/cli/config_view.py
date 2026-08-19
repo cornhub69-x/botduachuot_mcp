@@ -91,7 +91,7 @@ def load_env(repo_root: Path) -> dict[str, str]:
         for key, value in dotenv_values(env_file).items():
             if value is not None:
                 values[str(key)] = str(value)
-    for key in set(values) | {"BQA_TOKEN", "BQA_BASE_URL"}:
+    for key in set(values) | {"DUACHUOT_TOKEN", "DUACHUOT_BASE_URL"}:
         if key in os.environ:
             values[key] = os.environ[key]
     return values
@@ -220,7 +220,7 @@ def validate_config(
 
     required_executables = {
         "fastmcp": repo_root / ".venv" / "bin" / "fastmcp",
-        "cli_wrapper": repo_root / "bin" / "bqa",
+        "cli_wrapper": repo_root / "bin" / "duachuot",
         "process_helpers": repo_root / "scripts" / "process_helpers.sh",
     }
     for name, path in required_executables.items():
@@ -230,8 +230,8 @@ def validate_config(
             str(path),
         )
 
-    global_cli = shutil.which("bqa")
-    expected_cli = (repo_root / "bin" / "bqa").resolve()
+    global_cli = shutil.which("duachuot")
+    expected_cli = (repo_root / "bin" / "duachuot").resolve()
     global_ok = False
     if global_cli:
         try:

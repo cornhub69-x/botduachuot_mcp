@@ -65,7 +65,7 @@ For stronger isolation, run the service in a dedicated account, container, VM, o
 5. Prefer `HOST_COMMAND_POLICY=allowlist` for narrowly defined workflows.
 6. Set `HOST_INHERIT_ENV=false` when commands need only the base/allowlisted environment.
 7. Size command/rate limits for the host.
-8. Run `bqa config validate --strict` and `./scripts/quality_gate.sh --full`.
+8. Run `duachuot config validate --strict` and `./scripts/quality_gate.sh --full`.
 9. Use a clean dedicated virtualenv for production.
 
 ## Security verification
@@ -91,17 +91,17 @@ Collect redacted diagnostics first when safe:
 Inspect managed status and logs:
 
 ```bash
-bqa status
-bqa doctor
-bqa logs server -n 200
-bqa logs audit -n 200
-bqa logs tunnel -n 200
+duachuot status
+duachuot doctor
+duachuot logs server -n 200
+duachuot logs audit -n 200
+duachuot logs tunnel -n 200
 ```
 
 Stop managed processes when necessary:
 
 ```bash
-bqa stop
+duachuot stop
 ```
 
 Lifecycle scripts validate process ownership before termination and refuse to kill unrelated reused PIDs.

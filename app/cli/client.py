@@ -52,7 +52,7 @@ class RESTClient:
     def _headers(self, *, json_body: bool = False, accept: str = "application/json") -> dict[str, str]:
         headers = {
             "Accept": accept,
-            "User-Agent": "bqa-cli/1.0",
+            "User-Agent": "duachuot-cli/1.0",
         }
         if json_body:
             headers["Content-Type"] = "application/json"

@@ -37,6 +37,10 @@ skills/
 datasets/
 └── landmarks.json
 
+resources/
+└── RESOURCE_MAP.json (generated from the host ctf-tools repo)
+└── landmarks.json
+
 install.sh
 scripts/
 ├── install_basic.sh
@@ -63,13 +67,13 @@ It can be customized with environment variables:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/cornhub69-x/botduachuot_mcp/main/install.sh | \
-  BQA_INSTALL_DIR="$HOME/apps/botduachuot_mcp" \
-  BQA_BIN_DIR="$HOME/.local/bin" \
-  BQA_BRANCH=main \
+  DUACHUOT_INSTALL_DIR="$HOME/apps/botduachuot_mcp" \
+  DUACHUOT_BIN_DIR="$HOME/.local/bin" \
+  DUACHUOT_BRANCH=main \
   bash
 ```
 
-Supported variables: `BQA_REPO_URL`, `BQA_INSTALL_DIR`, `BQA_BIN_DIR`, `BQA_BRANCH`. `BQA_SKIP_PIP_UPGRADE=true` should only be used in test environments or offline setups with a prepared package cache.
+Supported variables: `DUACHUOT_REPO_URL`, `DUACHUOT_INSTALL_DIR`, `DUACHUOT_BIN_DIR`, `DUACHUOT_BRANCH`. `DUACHUOT_SKIP_PIP_UPGRADE=true` should only be used in test environments or offline setups with a prepared package cache.
 
 ### 2. Manual install from a local repository
 
@@ -210,7 +214,7 @@ duachuot_knowledge
 
 ## Investigation tools (Forensics + OSINT + Geo)
 
-BotDuaChuot adds 19 dedicated investigation tools, fully offline and deterministic:
+BotDuaChuot adds 20 dedicated investigation tools, fully offline and deterministic:
 
 ```text
 # Geo Engine (offline, no network required)
@@ -237,7 +241,13 @@ duachuot_ops_jitter          # human-like delay between network queries
 duachuot_ops_redact          # redact secret/flag before writing logs
 duachuot_platform            # probe OS/arch/distro/shell + tool availability (native/WSL/missing)
 duachuot_plan                # generate an investigation plan by artifact type
+duachuot_resource_lookup     # resolve a managed ctf-tools resource from RESOURCE_MAP.json
 ```
+
+Resource Registry: `resources/RESOURCE_MAP.json` is generated from the host
+ctf-tools repository by `scripts/generate_resource_map.py` (skills, scripts,
+tools, bin entries, notes). Lookups return path + invoke template + availability;
+missing resources are BLOCKERs, never silent fallbacks.
 
 Full playbooks: `knowledge/GEO_PLAYBOOK.md`, `knowledge/FORENSICS_PLAYBOOK.md`, `knowledge/OSINT_PLAYBOOK.md`. Bundled skills: `skills/ctf-geo`, `skills/ctf-forensics-plus`, `skills/ctf-osint-plus`, `skills/ctf-stego-plus`.
 

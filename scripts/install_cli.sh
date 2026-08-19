@@ -2,9 +2,9 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-TARGET_DIR="${BQA_BIN_DIR:-$HOME/.local/bin}"
-TARGET="$TARGET_DIR/bqa"
-SOURCE="$ROOT_DIR/bin/bqa"
+TARGET_DIR="${DUACHUOT_BIN_DIR:-$HOME/.local/bin}"
+TARGET="$TARGET_DIR/duachuot"
+SOURCE="$ROOT_DIR/bin/duachuot"
 
 [ -x "$SOURCE" ] || {
     echo "[-] CLI wrapper is missing or not executable: $SOURCE" >&2
@@ -26,7 +26,7 @@ resolved="$(readlink -f "$TARGET")"
 
 "$TARGET" version >/dev/null
 
-echo "[+] Installed bqa: $TARGET -> $SOURCE"
+echo "[+] Installed duachuot: $TARGET -> $SOURCE"
 case ":${PATH:-}:" in
     *":$TARGET_DIR:"*) ;;
     *) echo "[!] $TARGET_DIR is not currently in PATH." ;;

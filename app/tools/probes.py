@@ -98,7 +98,22 @@ def duachuot_pcap_probe(path: str, max_flows: int = 30) -> dict[str, Any]:
             ],
             timeout=60,
         )
+        if geo_hints["exit_code"] != 0:
+            geo_hints["fallback"] = _run(
+                "tshark",
+                [
+                    "-r", path,
+                    "-Y",
+                    "frame contains \"GPRMC\" or frame contains \"GGA\"",
+                    "-T", "fields",
+                    "-e", "udp.payload",
+                ],
+                timeout=60,
+            )
         result["geo_hints"] = geo_hints
+        result["geo_hints"]["hits"] = _nmea_hits(geo_hints.get("stdout", "")) + _nmea_hits(
+            geo_hints.get("fallback", {}).get("stdout", "")
+        )
         return result
     except Exception as exc:
         return format_error_response(exc)
@@ -254,3 +269,13 @@ def _extract_strings_hint(raw: bytes) -> list[str]:
         if index >= 0:
             hints.append(marker.decode("latin-1"))
     return hints[:20]
+
+
+def _nmea_hits(stdout: str) -> list[str]:
+    """Detect NMEA sentence markers in tshark output (ASCII or hex-encoded)."""
+    hits: list[str] = []
+    upper = stdout.upper()
+    for marker in ("GPRMC", "GPGGA", "GGA"):
+        if marker in upper or marker.encode().hex().upper() in upper:
+            hits.append(marker)
+    return hits

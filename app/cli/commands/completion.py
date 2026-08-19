@@ -8,7 +8,7 @@ _COMMANDS = "start stop restart status url server health capabilities fs cmd kno
 
 def generate(shell: str) -> str:
     if shell == "bash":
-        return f'''_bqa_complete() {{
+        return f'''_duachuot_complete() {{
     local cur prev
     COMPREPLY=()
     cur="${{COMP_WORDS[COMP_CWORD]}}"
@@ -26,10 +26,10 @@ def generate(shell: str) -> str:
         COMPREPLY=( $(compgen -W "{_COMMANDS}" -- "$cur") )
     fi
 }}
-complete -F _bqa_complete bqa
+complete -F _duachuot_complete duachuot
 '''
     if shell == "zsh":
-        return f'''#compdef bqa
+        return f'''#compdef duachuot
 _arguments '1:command:({ _COMMANDS })' '*::arg:->args'
 case $words[2] in
   server) _values 'server command' restart status ;;
@@ -40,14 +40,14 @@ case $words[2] in
   completion) _values 'shell' bash zsh fish ;;
 esac
 '''.replace("{ _COMMANDS }", _COMMANDS)
-    return f'''complete -c bqa -f
-complete -c bqa -n '__fish_use_subcommand' -a '{_COMMANDS}'
-complete -c bqa -n '__fish_seen_subcommand_from server' -a 'restart status'
-complete -c bqa -n '__fish_seen_subcommand_from fs' -a 'ls cat write append replace mkdir search'
-complete -c bqa -n '__fish_seen_subcommand_from cmd' -a 'check run'
-complete -c bqa -n '__fish_seen_subcommand_from knowledge' -a 'overview guide tools search all'
-complete -c bqa -n '__fish_seen_subcommand_from config' -a 'show get path validate'
-complete -c bqa -n '__fish_seen_subcommand_from completion' -a 'bash zsh fish'
+    return f'''complete -c duachuot -f
+complete -c duachuot -n '__fish_use_subcommand' -a '{_COMMANDS}'
+complete -c duachuot -n '__fish_seen_subcommand_from server' -a 'restart status'
+complete -c duachuot -n '__fish_seen_subcommand_from fs' -a 'ls cat write append replace mkdir search'
+complete -c duachuot -n '__fish_seen_subcommand_from cmd' -a 'check run'
+complete -c duachuot -n '__fish_seen_subcommand_from knowledge' -a 'overview guide tools search all'
+complete -c duachuot -n '__fish_seen_subcommand_from config' -a 'show get path validate'
+complete -c duachuot -n '__fish_seen_subcommand_from completion' -a 'bash zsh fish'
 '''
 
 

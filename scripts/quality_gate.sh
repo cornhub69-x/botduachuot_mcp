@@ -45,7 +45,7 @@ run_gate "pytest" .venv/bin/python -m pytest -q
 run_gate "compileall" .venv/bin/python -m compileall -q app tests scripts/benchmark_resilience.py
 run_gate "bash syntax" bash -n \
     run_mcp_tunnel.sh \
-    bin/bqa \
+    bin/duachuot \
     manual_test_tunnel_logic.sh \
     scripts/collect_diagnostics.sh \
     scripts/install_basic.sh \
@@ -59,14 +59,14 @@ run_gate "bash syntax" bash -n \
     scripts/uninstall_cli.sh
 run_gate "git diff check" git diff --check
 run_gate "project dependency closure" .venv/bin/python -m app.dependency_check
-run_gate "CLI version" .venv/bin/bqa version
-run_gate "configuration validation" .venv/bin/bqa config validate --json
+run_gate "CLI version" .venv/bin/duachuot version
+run_gate "configuration validation" .venv/bin/duachuot config validate --json
 
 if [ "$RUN_RUNTIME" -eq 1 ]; then
-    run_gate "local runtime doctor" .venv/bin/bqa doctor --local-only --json
+    run_gate "local runtime doctor" .venv/bin/duachuot doctor --local-only --json
 fi
 if [ "$RUN_FULL" -eq 1 ]; then
-    run_gate "public runtime doctor" .venv/bin/bqa doctor --json
+    run_gate "public runtime doctor" .venv/bin/duachuot doctor --json
     run_gate "isolated tunnel lifecycle" ./manual_test_tunnel_logic.sh
 fi
 

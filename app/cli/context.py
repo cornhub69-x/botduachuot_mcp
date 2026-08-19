@@ -101,7 +101,7 @@ class CLIContext:
             raise CLIError("Use only one of --public, --local, or --base-url.", EXIT_USAGE)
 
         public = bool(getattr(args, "public", False))
-        explicit_base = getattr(args, "base_url", None) or os.getenv("BQA_BASE_URL", "")
+        explicit_base = getattr(args, "base_url", None) or os.getenv("DUACHUOT_BASE_URL", "")
         if explicit_base:
             base_url = normalize_base_url(explicit_base)
         elif public:
@@ -126,7 +126,7 @@ class CLIContext:
                 raise NotFoundCLIError(f"Token file not found: {path}")
             token = path.read_text(encoding="utf-8").strip()
         if not token:
-            token = os.getenv("BQA_TOKEN") or os.getenv("GATEWAY_TOKEN") or values.get("GATEWAY_TOKEN", "")
+            token = os.getenv("DUACHUOT_TOKEN") or os.getenv("GATEWAY_TOKEN") or values.get("GATEWAY_TOKEN", "")
 
         try:
             request_timeout = float(getattr(args, "request_timeout", 15.0))

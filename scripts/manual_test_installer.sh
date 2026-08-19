@@ -8,7 +8,7 @@ RESULT_FILE="$ROOT_DIR/logs/installer_manual_test_results.txt"
 mkdir -p logs
 : > "$RESULT_FILE"
 
-TMP_DIR="$(mktemp -d -t bqa-installer-test-XXXXXX)"
+TMP_DIR="$(mktemp -d -t duachuot-installer-test-XXXXXX)"
 PASS_COUNT=0
 CURRENT_TEST="initialization"
 
@@ -53,8 +53,8 @@ install_env() {
     shift 2
     env \
         HOME="$home_dir" \
-        BQA_BIN_DIR="$bin_dir" \
-        BQA_SKIP_PIP_UPGRADE=true \
+        DUACHUOT_BIN_DIR="$bin_dir" \
+        DUACHUOT_SKIP_PIP_UPGRADE=true \
         PIP_DISABLE_PIP_VERSION_CHECK=1 \
         "$@"
 }
@@ -64,9 +64,9 @@ verify_install() {
     [ -x "$repo/.venv/bin/python" ]
     [ -f "$repo/.env" ]
     [ "$(stat -c '%a' "$repo/.env")" = "600" ]
-    [ -L "$bin_dir/bqa" ]
-    [ "$(readlink -f "$bin_dir/bqa")" = "$repo/bin/bqa" ]
-    [ "$("$bin_dir/bqa" version)" = "bqa 1.0.0" ]
+    [ -L "$bin_dir/duachuot" ]
+    [ "$(readlink -f "$bin_dir/duachuot")" = "$repo/bin/duachuot" ]
+    [ "$("$bin_dir/duachuot" version)" = "duachuot 1.0.0" ]
     "$repo/.venv/bin/python" -m pip check >/dev/null
 }
 
@@ -118,11 +118,11 @@ mkdir -p "$OUTSIDE_DIR"
     cd "$OUTSIDE_DIR"
     cat "$SOURCE_REPO/install.sh" | env \
         HOME="$REMOTE_HOME" \
-        BQA_BIN_DIR="$REMOTE_BIN" \
-        BQA_INSTALL_DIR="$REMOTE_TARGET" \
-        BQA_REPO_URL="$BARE_REPO" \
-        BQA_BRANCH=main \
-        BQA_SKIP_PIP_UPGRADE=true \
+        DUACHUOT_BIN_DIR="$REMOTE_BIN" \
+        DUACHUOT_INSTALL_DIR="$REMOTE_TARGET" \
+        DUACHUOT_REPO_URL="$BARE_REPO" \
+        DUACHUOT_BRANCH=main \
+        DUACHUOT_SKIP_PIP_UPGRADE=true \
         PIP_DISABLE_PIP_VERSION_CHECK=1 \
         bash
 ) > "$TMP_DIR/remote-install.log"
@@ -139,11 +139,11 @@ git -C "$SOURCE_REPO" push --quiet origin main
     cd "$OUTSIDE_DIR"
     cat "$SOURCE_REPO/install.sh" | env \
         HOME="$REMOTE_HOME" \
-        BQA_BIN_DIR="$REMOTE_BIN" \
-        BQA_INSTALL_DIR="$REMOTE_TARGET" \
-        BQA_REPO_URL="$BARE_REPO" \
-        BQA_BRANCH=main \
-        BQA_SKIP_PIP_UPGRADE=true \
+        DUACHUOT_BIN_DIR="$REMOTE_BIN" \
+        DUACHUOT_INSTALL_DIR="$REMOTE_TARGET" \
+        DUACHUOT_REPO_URL="$BARE_REPO" \
+        DUACHUOT_BRANCH=main \
+        DUACHUOT_SKIP_PIP_UPGRADE=true \
         PIP_DISABLE_PIP_VERSION_CHECK=1 \
         bash
 ) > "$TMP_DIR/remote-update.log"
@@ -157,11 +157,11 @@ if (
     cd "$OUTSIDE_DIR"
     cat "$SOURCE_REPO/install.sh" | env \
         HOME="$REMOTE_HOME" \
-        BQA_BIN_DIR="$REMOTE_BIN" \
-        BQA_INSTALL_DIR="$REMOTE_TARGET" \
-        BQA_REPO_URL="$BARE_REPO" \
-        BQA_BRANCH=main \
-        BQA_SKIP_PIP_UPGRADE=true \
+        DUACHUOT_BIN_DIR="$REMOTE_BIN" \
+        DUACHUOT_INSTALL_DIR="$REMOTE_TARGET" \
+        DUACHUOT_REPO_URL="$BARE_REPO" \
+        DUACHUOT_BRANCH=main \
+        DUACHUOT_SKIP_PIP_UPGRADE=true \
         bash
 ) > "$TMP_DIR/dirty.out" 2> "$TMP_DIR/dirty.err"; then
     DIRTY_EXIT=0
@@ -182,11 +182,11 @@ if (
     cd "$OUTSIDE_DIR"
     cat "$SOURCE_REPO/install.sh" | env \
         HOME="$REMOTE_HOME" \
-        BQA_BIN_DIR="$REMOTE_BIN" \
-        BQA_INSTALL_DIR="$REMOTE_TARGET" \
-        BQA_REPO_URL="$BARE_REPO" \
-        BQA_BRANCH=main \
-        BQA_SKIP_PIP_UPGRADE=true \
+        DUACHUOT_BIN_DIR="$REMOTE_BIN" \
+        DUACHUOT_INSTALL_DIR="$REMOTE_TARGET" \
+        DUACHUOT_REPO_URL="$BARE_REPO" \
+        DUACHUOT_BRANCH=main \
+        DUACHUOT_SKIP_PIP_UPGRADE=true \
         bash
 ) > "$TMP_DIR/origin.out" 2> "$TMP_DIR/origin.err"; then
     ORIGIN_EXIT=0
@@ -203,11 +203,11 @@ if (
     cd "$OUTSIDE_DIR"
     cat "$SOURCE_REPO/install.sh" | env \
         HOME="$TMP_DIR/invalid-home" \
-        BQA_BIN_DIR="$TMP_DIR/invalid-bin" \
-        BQA_INSTALL_DIR="$TMP_DIR/invalid-target" \
-        BQA_REPO_URL="$BARE_REPO" \
-        BQA_BRANCH=missing-branch \
-        BQA_SKIP_PIP_UPGRADE=true \
+        DUACHUOT_BIN_DIR="$TMP_DIR/invalid-bin" \
+        DUACHUOT_INSTALL_DIR="$TMP_DIR/invalid-target" \
+        DUACHUOT_REPO_URL="$BARE_REPO" \
+        DUACHUOT_BRANCH=missing-branch \
+        DUACHUOT_SKIP_PIP_UPGRADE=true \
         bash
 ) > "$TMP_DIR/missing.out" 2> "$TMP_DIR/missing.err"; then
     MISSING_EXIT=0

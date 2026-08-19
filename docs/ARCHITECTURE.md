@@ -3,7 +3,7 @@
 ## Runtime flow
 
 ```text
-ChatGPT / bqa / REST client
+ChatGPT / duachuot / REST client
         │
         ├── local HTTP
         └── Cloudflare Tunnel (optional)
@@ -133,12 +133,12 @@ start_tunnel_server.sh supervisor
 - The canonical tunnel URL is written atomically to `logs/tunnel_url.txt`.
 - Process ownership is validated through `/proc/<pid>/cmdline`, not PID liveness alone.
 - The supervisor can recover a failed server or tunnel independently.
-- `bqa server restart` changes only the bridge and preserves tunnel PID/URL.
+- `duachuot server restart` changes only the bridge and preserves tunnel PID/URL.
 - Stop operations terminate the ownership controller first and refuse unrelated reused PIDs.
 
 ## CLI and operations
 
-`bqa` has two execution modes:
+`duachuot` has two execution modes:
 
 - local lifecycle operations through repository scripts;
 - host operations through the REST API using local, public, or explicit base URLs.

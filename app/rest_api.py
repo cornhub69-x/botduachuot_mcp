@@ -254,7 +254,7 @@ async def api_run_command(request: Request) -> JSONResponse:
 
 async def api_knowledge(request: Request) -> JSONResponse:
     try:
-        from app.tools.duachuot_knowledge import duachuot_knowledge
+        from app.tools.host_knowledge import duachuot_knowledge
 
         return await _call(
             duachuot_knowledge,

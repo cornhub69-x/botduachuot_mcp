@@ -19,3 +19,4 @@ Thumbs.db
 
 # Derived artifacts
 .duachuot-tmp-*/
+*.egg-info/

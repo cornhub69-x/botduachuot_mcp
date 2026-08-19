@@ -251,9 +251,9 @@ required platform. Missing resource → BLOCKER, never run the wrong thing.
 
 ## 9. ANTI-DETECTION — INVISIBLE ARCHITECTURE (like BotQuangAnh)
 
-**Principle**: botquanganh cannot be detected as an AI agent because the MCP
-runs locally — the CTF server only sees HTTP from the user's IP/machine. Bot
-Dua Chuot keeps the same model:
+**Principle**: like BotQuangAnh, BotDuaChuot cannot be detected as an AI agent
+because the MCP runs locally — the CTF server only sees HTTP from the user's
+IP/machine. Bot Dua Chuot keeps the same model:
 
 ```
 CTF server sees:     normal HTTP requests from the user's machine (like a human)

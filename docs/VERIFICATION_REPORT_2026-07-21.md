@@ -21,13 +21,13 @@ The test also verified:
 - `.venv` creation and dependency installation.
 - Editable CLI package installation.
 - `.env` creation, preservation, and mode `600`.
-- `~/.local/bin/bqa`-style symlink resolution.
-- `bqa version` output.
+- `~/.local/bin/duachuot`-style symlink resolution.
+- `duachuot version` output.
 - `pip check` success.
 
 ## Server-only restart regression
 
-A live `bqa server restart --json` test reproduced and fixed a lifecycle bug where `lsof -i :PORT` treated the Cloudflare client connection as a process occupying the listening port.
+A live `duachuot server restart --json` test reproduced and fixed a lifecycle bug where `lsof -i :PORT` treated the Cloudflare client connection as a process occupying the listening port.
 
 The corrected implementation:
 

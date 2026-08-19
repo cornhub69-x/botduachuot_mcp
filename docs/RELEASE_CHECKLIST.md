@@ -40,8 +40,8 @@ uvx detect-secrets scan --all-files \
 
 ## Runtime and recovery
 
-- [ ] `bqa status` reports owned supervisor/server/tunnel processes.
-- [ ] `bqa server restart` preserves tunnel PID and URL.
+- [ ] `duachuot status` reports owned supervisor/server/tunnel processes.
+- [ ] `duachuot server restart` preserves tunnel PID and URL.
 - [ ] Local and public REST health pass.
 - [ ] Local and public MCP initialize pass.
 - [ ] Redacted diagnostics can be collected.
@@ -49,7 +49,7 @@ uvx detect-secrets scan --all-files \
 
 ## Packaging and automation
 
-- [ ] `bqa` works from a directory outside the repository.
+- [ ] `duachuot` works from a directory outside the repository.
 - [ ] `./scripts/manual_test_installer.sh` passes local, piped, remote-clone, update, dirty-tree, origin-mismatch, and invalid-branch cases.
 - [ ] Global install/uninstall tests pass.
 - [ ] GitHub quality workflow is reviewed.

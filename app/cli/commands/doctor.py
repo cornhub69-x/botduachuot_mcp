@@ -46,7 +46,7 @@ def _mcp_check(client: RESTClient, path: str, name: str) -> dict[str, str]:
         "params": {
             "protocolVersion": "2025-03-26",
             "capabilities": {},
-            "clientInfo": {"name": "bqa-doctor", "version": "1.0"},
+            "clientInfo": {"name": "duachuot-doctor", "version": "1.0"},
         },
     }
     try:
@@ -90,7 +90,7 @@ def handle_doctor(ctx: CLIContext, args) -> int:
     checks.append(
         _executable_check("fastmcp", ctx.repo_root / ".venv" / "bin" / "fastmcp")
     )
-    checks.append(_executable_check("cli_wrapper", ctx.repo_root / "bin" / "bqa"))
+    checks.append(_executable_check("cli_wrapper", ctx.repo_root / "bin" / "duachuot"))
     checks.append(
         _executable_check(
             "process_helpers",
@@ -124,8 +124,8 @@ def handle_doctor(ctx: CLIContext, args) -> int:
         )
     )
 
-    global_cli = shutil.which("bqa")
-    expected_cli = (ctx.repo_root / "bin" / "bqa").resolve()
+    global_cli = shutil.which("duachuot")
+    expected_cli = (ctx.repo_root / "bin" / "duachuot").resolve()
     global_ok = False
     if global_cli:
         try:

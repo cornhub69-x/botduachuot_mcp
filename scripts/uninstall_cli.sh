@@ -2,12 +2,12 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-TARGET_DIR="${BQA_BIN_DIR:-$HOME/.local/bin}"
-TARGET="$TARGET_DIR/bqa"
-SOURCE="$ROOT_DIR/bin/bqa"
+TARGET_DIR="${DUACHUOT_BIN_DIR:-$HOME/.local/bin}"
+TARGET="$TARGET_DIR/duachuot"
+SOURCE="$ROOT_DIR/bin/duachuot"
 
 if [ ! -e "$TARGET" ] && [ ! -L "$TARGET" ]; then
-    echo "[i] bqa is not installed at $TARGET"
+    echo "[i] duachuot is not installed at $TARGET"
     exit 0
 fi
 
@@ -18,4 +18,4 @@ if [ "$resolved" != "$SOURCE" ]; then
 fi
 
 rm -f "$TARGET"
-echo "[+] Removed bqa symlink: $TARGET"
+echo "[+] Removed duachuot symlink: $TARGET"

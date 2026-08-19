@@ -3,7 +3,7 @@
 ## 1. Installation
 
 ```bash
-cd /home/light/GitHub/botquanganh_mcp
+cd /home/light/GitHub/botduachuot_mcp
 ./scripts/install_basic.sh
 ```
 
@@ -11,8 +11,8 @@ The installer:
 
 - creates or reuses `.venv`;
 - installs pinned runtime dependencies;
-- installs the editable `bqa` package;
-- creates the global `~/.local/bin/bqa` symlink;
+- installs the editable `duachuot` package;
+- creates the global `~/.local/bin/duachuot` symlink;
 - creates `.env` when absent;
 - applies mode `600` to `.env`;
 - restores executable bits on CLI and shell scripts.
@@ -20,8 +20,8 @@ The installer:
 Verify:
 
 ```bash
-bqa version
-bqa config validate
+duachuot version
+duachuot config validate
 ```
 
 ## 2. Normal lifecycle
@@ -29,28 +29,28 @@ bqa config validate
 Start or adopt the managed supervisor:
 
 ```bash
-bqa start
+duachuot start
 ```
 
 Inspect status:
 
 ```bash
-bqa status
-bqa doctor
+duachuot status
+duachuot doctor
 ```
 
 After ordinary Python/code changes, restart only the bridge:
 
 ```bash
-bqa server restart
+duachuot server restart
 ```
 
-This operation must preserve the tunnel PID and URL. Do not use `bqa restart` for normal code changes.
+This operation must preserve the tunnel PID and URL. Do not use `duachuot restart` for normal code changes.
 
 Full restart, including a new Quick Tunnel URL:
 
 ```bash
-bqa restart --yes
+duachuot restart --yes
 ```
 
 Use only when the tunnel is dead, the URL is invalid, or a full restart is explicitly required.
@@ -86,20 +86,20 @@ The legacy command remains an alias:
 Normal doctor allows warnings:
 
 ```bash
-bqa doctor
+duachuot doctor
 ```
 
 Offline/local-only diagnosis:
 
 ```bash
-bqa doctor --local-only
+duachuot doctor --local-only
 ```
 
 Strict production-style diagnosis treats warnings as failures:
 
 ```bash
-bqa doctor --strict
-bqa config validate --strict
+duachuot doctor --strict
+duachuot config validate --strict
 ```
 
 `REQUIRE_AUTH=false` intentionally produces a warning. It is acceptable for the current development setup and should be enabled before production deployment.
@@ -125,10 +125,10 @@ The bundle excludes `.env` contents and runtime log bodies. It contains redacted
 ### Bridge is down but tunnel is alive
 
 ```bash
-bqa status
-bqa server restart
-bqa health
-bqa --public health
+duachuot status
+duachuot server restart
+duachuot health
+duachuot --public health
 ```
 
 Confirm tunnel PID and URL remain unchanged.
@@ -138,8 +138,8 @@ Confirm tunnel PID and URL remain unchanged.
 Run:
 
 ```bash
-bqa config validate
-bqa doctor --local-only
+duachuot config validate
+duachuot doctor --local-only
 ```
 
 Lifecycle scripts validate `/proc/<pid>/cmdline` before stopping a process. Unrelated reused PIDs are not terminated. Starting the supervisor removes/replaces stale managed state safely.
@@ -147,15 +147,15 @@ Lifecycle scripts validate `/proc/<pid>/cmdline` before stopping a process. Unre
 ### Tunnel process is dead
 
 ```bash
-bqa status
-bqa start
+duachuot status
+duachuot start
 ```
 
 The supervisor should recreate only the tunnel and publish the fresh canonical URL in `logs/tunnel_url.txt`.
 
 ### Port 8000 is occupied by an unrelated process
 
-`bqa server restart` refuses to terminate it. Identify the process manually:
+`duachuot server restart` refuses to terminate it. Identify the process manually:
 
 ```bash
 lsof -nP -i :8000
@@ -163,12 +163,12 @@ lsof -nP -i :8000
 
 Resolve the conflict explicitly; do not bypass the ownership check.
 
-### Global `bqa` command is missing
+### Global `duachuot` command is missing
 
 ```bash
 ./scripts/install_cli.sh
 rehash   # zsh
-bqa version
+duachuot version
 ```
 
 Remove only the repository-owned symlink:
@@ -192,8 +192,8 @@ Restore only the intended files or commit. Do not reset unrelated user changes. 
 
 ```bash
 ./scripts/quality_gate.sh
-bqa server restart
-bqa doctor
+duachuot server restart
+duachuot doctor
 ```
 
 A rollback of normal code must not restart the tunnel.
@@ -201,10 +201,10 @@ A rollback of normal code must not restart the tunnel.
 ## 8. Logs and capacity
 
 ```bash
-bqa logs server -n 100
-bqa logs tunnel -n 100
-bqa logs audit -n 100
-bqa health --json
+duachuot logs server -n 100
+duachuot logs tunnel -n 100
+duachuot logs audit -n 100
+duachuot health --json
 ```
 
 Health exposes:
@@ -229,7 +229,7 @@ Before deployment:
 1. Set `REQUIRE_AUTH=true`.
 2. Generate and configure a fresh gateway token.
 3. Keep `.env` mode `600`.
-4. Run `bqa config validate --strict`.
+4. Run `duachuot config validate --strict`.
 5. Run `./scripts/quality_gate.sh --full` against the authorized target.
 6. Confirm no uncommitted or unreviewed changes.
 7. Confirm capacity limits match the host resources.

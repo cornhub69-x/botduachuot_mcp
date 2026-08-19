@@ -172,3 +172,27 @@ def _osint_mode() -> bool:
     import app.config
 
     return app.config.OSINT_MODE
+
+@mcp.tool(
+    name="duachuot_resource_lookup",
+    description=(
+        "Look up a managed resource (skill, script, tool, bin, note) from the "
+        "ctf-tools Resource Registry (RESOURCE_MAP.json). Returns its path, "
+        "invoke template, and availability. A missing or unusable resource is "
+        "a BLOCKER, never a silent fallback."
+    ),
+)
+def duachuot_resource_lookup(name: str, refresh: bool = False) -> dict[str, Any]:
+    try:
+        from app.resources import RESOURCE_MAP_PATH, resolve_resource
+
+        if not RESOURCE_MAP_PATH.exists():
+            return format_error_response(
+                FileNotFoundError(
+                    "Resource Registry is not generated yet; "
+                    "run scripts/generate_resource_map.py first"
+                )
+            )
+        return {"ok": True, **resolve_resource(name, refresh=refresh)}
+    except Exception as exc:
+        return format_error_response(exc)

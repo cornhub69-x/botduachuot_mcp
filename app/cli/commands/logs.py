@@ -89,7 +89,7 @@ def _paths(ctx: CLIContext, args) -> list[tuple[str, Path]]:
         elif args.follow_target:
             names = [args.follow_target]
         else:
-            raise CLIError("Use 'bqa logs follow <target>' or 'bqa logs follow --all'.", EXIT_USAGE)
+            raise CLIError("Use 'duachuot logs follow <target>' or 'duachuot logs follow --all'.", EXIT_USAGE)
     elif args.all_logs:
         names = list(LOG_FILES)
     else:

@@ -1,0 +1,245 @@
+{
+  "version": 1,
+  "generated_by": "scripts/generate_resource_map.py",
+  "root": "/home/noname/ctf-tools",
+  "resources": {
+    "CTF-KNOWLEDGE": {
+      "name": "CTF-KNOWLEDGE",
+      "category": "note",
+      "path": "/home/noname/ctf-tools/notes/CTF-KNOWLEDGE.md",
+      "invoke": "read /home/noname/ctf-tools/notes/CTF-KNOWLEDGE.md",
+      "platform": "any"
+    },
+    "RsaCtfTool": {
+      "name": "RsaCtfTool",
+      "category": "tool",
+      "path": "/home/noname/ctf-tools/tools/RsaCtfTool",
+      "invoke": "/home/noname/ctf-tools/tools/RsaCtfTool",
+      "platform": "any"
+    },
+    "ctf-ai-ml": {
+      "name": "ctf-ai-ml",
+      "category": "skill",
+      "path": "/home/noname/ctf-tools/skills/ctf-ai-ml/SKILL.md",
+      "invoke": "read /home/noname/ctf-tools/skills/ctf-ai-ml/SKILL.md",
+      "platform": "any"
+    },
+    "ctf-ai-ml/model_triage.py": {
+      "name": "ctf-ai-ml/model_triage.py",
+      "category": "script",
+      "path": "/home/noname/ctf-tools/skills/ctf-ai-ml/scripts/model_triage.py",
+      "invoke": "python /home/noname/ctf-tools/skills/ctf-ai-ml/scripts/model_triage.py",
+      "platform": "any"
+    },
+    "ctf-android": {
+      "name": "ctf-android",
+      "category": "skill",
+      "path": "/home/noname/ctf-tools/skills/ctf-android/SKILL.md",
+      "invoke": "read /home/noname/ctf-tools/skills/ctf-android/SKILL.md",
+      "platform": "any"
+    },
+    "ctf-crypto-plus": {
+      "name": "ctf-crypto-plus",
+      "category": "skill",
+      "path": "/home/noname/ctf-tools/skills/ctf-crypto-plus/SKILL.md",
+      "invoke": "read /home/noname/ctf-tools/skills/ctf-crypto-plus/SKILL.md",
+      "platform": "any"
+    },
+    "ctf-crypto-plus/crypto_triage.py": {
+      "name": "ctf-crypto-plus/crypto_triage.py",
+      "category": "script",
+      "path": "/home/noname/ctf-tools/skills/ctf-crypto-plus/scripts/crypto_triage.py",
+      "invoke": "python /home/noname/ctf-tools/skills/ctf-crypto-plus/scripts/crypto_triage.py",
+      "platform": "any"
+    },
+    "ctf-crypto-plus/run_sage.py": {
+      "name": "ctf-crypto-plus/run_sage.py",
+      "category": "script",
+      "path": "/home/noname/ctf-tools/skills/ctf-crypto-plus/scripts/run_sage.py",
+      "invoke": "python /home/noname/ctf-tools/skills/ctf-crypto-plus/scripts/run_sage.py",
+      "platform": "any"
+    },
+    "ctf-forensics": {
+      "name": "ctf-forensics",
+      "category": "skill",
+      "path": "/home/noname/ctf-tools/skills/ctf-forensics/SKILL.md",
+      "invoke": "read /home/noname/ctf-tools/skills/ctf-forensics/SKILL.md",
+      "platform": "any"
+    },
+    "ctf-forensics-plus": {
+      "name": "ctf-forensics-plus",
+      "category": "skill",
+      "path": "/home/noname/ctf-tools/skills/ctf-forensics-plus/SKILL.md",
+      "invoke": "read /home/noname/ctf-tools/skills/ctf-forensics-plus/SKILL.md",
+      "platform": "any"
+    },
+    "ctf-geo": {
+      "name": "ctf-geo",
+      "category": "skill",
+      "path": "/home/noname/ctf-tools/skills/ctf-geo/SKILL.md",
+      "invoke": "read /home/noname/ctf-tools/skills/ctf-geo/SKILL.md",
+      "platform": "any"
+    },
+    "ctf-malware": {
+      "name": "ctf-malware",
+      "category": "skill",
+      "path": "/home/noname/ctf-tools/skills/ctf-malware/SKILL.md",
+      "invoke": "read /home/noname/ctf-tools/skills/ctf-malware/SKILL.md",
+      "platform": "any"
+    },
+    "ctf-misc": {
+      "name": "ctf-misc",
+      "category": "skill",
+      "path": "/home/noname/ctf-tools/skills/ctf-misc/SKILL.md",
+      "invoke": "read /home/noname/ctf-tools/skills/ctf-misc/SKILL.md",
+      "platform": "any"
+    },
+    "ctf-osint": {
+      "name": "ctf-osint",
+      "category": "skill",
+      "path": "/home/noname/ctf-tools/skills/ctf-osint/SKILL.md",
+      "invoke": "read /home/noname/ctf-tools/skills/ctf-osint/SKILL.md",
+      "platform": "any"
+    },
+    "ctf-osint-plus": {
+      "name": "ctf-osint-plus",
+      "category": "skill",
+      "path": "/home/noname/ctf-tools/skills/ctf-osint-plus/SKILL.md",
+      "invoke": "read /home/noname/ctf-tools/skills/ctf-osint-plus/SKILL.md",
+      "platform": "any"
+    },
+    "ctf-pattern-archive": {
+      "name": "ctf-pattern-archive",
+      "category": "skill",
+      "path": "/home/noname/ctf-tools/skills/ctf-pattern-archive/SKILL.md",
+      "invoke": "read /home/noname/ctf-tools/skills/ctf-pattern-archive/SKILL.md",
+      "platform": "any"
+    },
+    "ctf-pattern-archive/_archive_util.py": {
+      "name": "ctf-pattern-archive/_archive_util.py",
+      "category": "script",
+      "path": "/home/noname/ctf-tools/skills/ctf-pattern-archive/scripts/_archive_util.py",
+      "invoke": "python /home/noname/ctf-tools/skills/ctf-pattern-archive/scripts/_archive_util.py",
+      "platform": "any"
+    },
+    "ctf-pattern-archive/activate_patterns.py": {
+      "name": "ctf-pattern-archive/activate_patterns.py",
+      "category": "script",
+      "path": "/home/noname/ctf-tools/skills/ctf-pattern-archive/scripts/activate_patterns.py",
+      "invoke": "python /home/noname/ctf-tools/skills/ctf-pattern-archive/scripts/activate_patterns.py",
+      "platform": "any"
+    },
+    "ctf-pattern-archive/build_pattern_index.py": {
+      "name": "ctf-pattern-archive/build_pattern_index.py",
+      "category": "script",
+      "path": "/home/noname/ctf-tools/skills/ctf-pattern-archive/scripts/build_pattern_index.py",
+      "invoke": "python /home/noname/ctf-tools/skills/ctf-pattern-archive/scripts/build_pattern_index.py",
+      "platform": "any"
+    },
+    "ctf-pattern-archive/query_patterns.py": {
+      "name": "ctf-pattern-archive/query_patterns.py",
+      "category": "script",
+      "path": "/home/noname/ctf-tools/skills/ctf-pattern-archive/scripts/query_patterns.py",
+      "invoke": "python /home/noname/ctf-tools/skills/ctf-pattern-archive/scripts/query_patterns.py",
+      "platform": "any"
+    },
+    "ctf-pattern-archive/run_untrusted.py": {
+      "name": "ctf-pattern-archive/run_untrusted.py",
+      "category": "script",
+      "path": "/home/noname/ctf-tools/skills/ctf-pattern-archive/scripts/run_untrusted.py",
+      "invoke": "python /home/noname/ctf-tools/skills/ctf-pattern-archive/scripts/run_untrusted.py",
+      "platform": "any"
+    },
+    "ctf-pattern-archive/validate_skill_tree.py": {
+      "name": "ctf-pattern-archive/validate_skill_tree.py",
+      "category": "script",
+      "path": "/home/noname/ctf-tools/skills/ctf-pattern-archive/scripts/validate_skill_tree.py",
+      "invoke": "python /home/noname/ctf-tools/skills/ctf-pattern-archive/scripts/validate_skill_tree.py",
+      "platform": "any"
+    },
+    "ctf-pattern-archive/workspace_signals.py": {
+      "name": "ctf-pattern-archive/workspace_signals.py",
+      "category": "script",
+      "path": "/home/noname/ctf-tools/skills/ctf-pattern-archive/scripts/workspace_signals.py",
+      "invoke": "python /home/noname/ctf-tools/skills/ctf-pattern-archive/scripts/workspace_signals.py",
+      "platform": "any"
+    },
+    "ctf-pwn": {
+      "name": "ctf-pwn",
+      "category": "skill",
+      "path": "/home/noname/ctf-tools/skills/ctf-pwn/SKILL.md",
+      "invoke": "read /home/noname/ctf-tools/skills/ctf-pwn/SKILL.md",
+      "platform": "any"
+    },
+    "ctf-reverse": {
+      "name": "ctf-reverse",
+      "category": "skill",
+      "path": "/home/noname/ctf-tools/skills/ctf-reverse/SKILL.md",
+      "invoke": "read /home/noname/ctf-tools/skills/ctf-reverse/SKILL.md",
+      "platform": "any"
+    },
+    "ctf-reverse/apk_triage.py": {
+      "name": "ctf-reverse/apk_triage.py",
+      "category": "script",
+      "path": "/home/noname/ctf-tools/skills/ctf-reverse/scripts/apk_triage.py",
+      "invoke": "python /home/noname/ctf-tools/skills/ctf-reverse/scripts/apk_triage.py",
+      "platform": "any"
+    },
+    "ctf-stego-plus": {
+      "name": "ctf-stego-plus",
+      "category": "skill",
+      "path": "/home/noname/ctf-tools/skills/ctf-stego-plus/SKILL.md",
+      "invoke": "read /home/noname/ctf-tools/skills/ctf-stego-plus/SKILL.md",
+      "platform": "any"
+    },
+    "ctf-web": {
+      "name": "ctf-web",
+      "category": "skill",
+      "path": "/home/noname/ctf-tools/skills/ctf-web/SKILL.md",
+      "invoke": "read /home/noname/ctf-tools/skills/ctf-web/SKILL.md",
+      "platform": "any"
+    },
+    "ctf-writeup": {
+      "name": "ctf-writeup",
+      "category": "skill",
+      "path": "/home/noname/ctf-tools/skills/ctf-writeup/SKILL.md",
+      "invoke": "read /home/noname/ctf-tools/skills/ctf-writeup/SKILL.md",
+      "platform": "any"
+    },
+    "ctfpy": {
+      "name": "ctfpy",
+      "category": "bin",
+      "path": "/home/noname/ctf-tools/bin/ctfpy",
+      "invoke": "/home/noname/ctf-tools/bin/ctfpy",
+      "platform": "any"
+    },
+    "pentestcode": {
+      "name": "pentestcode",
+      "category": "bin",
+      "path": "/home/noname/ctf-tools/bin/pentestcode",
+      "invoke": "/home/noname/ctf-tools/bin/pentestcode",
+      "platform": "any"
+    },
+    "ropper-venv": {
+      "name": "ropper-venv",
+      "category": "tool",
+      "path": "/home/noname/ctf-tools/tools/ropper-venv",
+      "invoke": "/home/noname/ctf-tools/tools/ropper-venv",
+      "platform": "any"
+    },
+    "rsactftool": {
+      "name": "rsactftool",
+      "category": "bin",
+      "path": "/home/noname/ctf-tools/bin/rsactftool",
+      "invoke": "/home/noname/ctf-tools/bin/rsactftool",
+      "platform": "any"
+    },
+    "solve-challenge": {
+      "name": "solve-challenge",
+      "category": "skill",
+      "path": "/home/noname/ctf-tools/skills/solve-challenge/SKILL.md",
+      "invoke": "read /home/noname/ctf-tools/skills/solve-challenge/SKILL.md",
+      "platform": "any"
+    }
+  }
+}

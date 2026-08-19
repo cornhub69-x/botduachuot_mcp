@@ -4,7 +4,7 @@ set -Eeuo pipefail
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT_DIR"
 
-BQA="$ROOT_DIR/bin/bqa"
+BQA="$ROOT_DIR/bin/duachuot"
 PYTHON="$ROOT_DIR/.venv/bin/python"
 RESULT_FILE="$ROOT_DIR/logs/cli_manual_test_results.txt"
 mkdir -p logs
@@ -12,7 +12,7 @@ mkdir -p logs
 
 PASS_COUNT=0
 CURRENT_TEST="initialization"
-TMP_DIR="$(mktemp -d -t bqa-cli-test-XXXXXX)"
+TMP_DIR="$(mktemp -d -t duachuot-cli-test-XXXXXX)"
 ISO_DIR=""
 TEST_LOCAL=""
 
@@ -75,12 +75,12 @@ expect_exit() {
 
 CURRENT_TEST="syntax and packaging"
 "$PYTHON" -m compileall -q app/cli
-bash -n bin/bqa scripts/manual_test_cli.sh
+bash -n bin/duachuot scripts/manual_test_cli.sh
 "$PYTHON" -m pip install -e . --no-deps >/dev/null
 "$BQA" --help > "$TMP_DIR/help.txt"
 grep -q "{start,stop,restart,status,url,server,health,capabilities,fs,cmd,knowledge,logs,config,doctor,completion,version}" "$TMP_DIR/help.txt"
-[ "$("$BQA" version)" = "bqa 1.0.0" ]
-[ "$(.venv/bin/bqa version)" = "bqa 1.0.0" ]
+[ "$("$BQA" version)" = "duachuot 1.0.0" ]
+[ "$(.venv/bin/duachuot version)" = "duachuot 1.0.0" ]
 pass "build, executable, packaging, help, version"
 
 CURRENT_TEST="completion"
@@ -299,31 +299,31 @@ echo $! > logs/server.pid
 sleep 0.2
 echo restarted
 SH
-chmod +x "$ISO_DIR/run_mcp_tunnel.sh" "$ISO_DIR/scripts/restart_server_only.sh" "$ISO_DIR/bin/bqa"
-iso_bqa() {
-    (cd "$ISO_DIR" && env -i HOME="$HOME" PATH="$PATH" LANG="${LANG:-C.UTF-8}" ./bin/bqa "$@")
+chmod +x "$ISO_DIR/run_mcp_tunnel.sh" "$ISO_DIR/scripts/restart_server_only.sh" "$ISO_DIR/bin/duachuot"
+iso_duachuot() {
+    (cd "$ISO_DIR" && env -i HOME="$HOME" PATH="$PATH" LANG="${LANG:-C.UTF-8}" ./bin/duachuot "$@")
 }
-iso_bqa start > /dev/null
+iso_duachuot start > /dev/null
 sleep 0.3
-iso_bqa status --json > "$TMP_DIR/iso-status.json" || true
+iso_duachuot status --json > "$TMP_DIR/iso-status.json" || true
 log "ISOLATED_STATUS=$(tr '\n' ' ' < "$TMP_DIR/iso-status.json")"
 json_assert "$TMP_DIR/iso-status.json" "data['ok'] is True and data['url'].startswith('https://isolated-1.')"
 ISO_TUNNEL_BEFORE=$(cat "$ISO_DIR/logs/tunnel.pid")
 ISO_URL_BEFORE=$(cat "$ISO_DIR/logs/tunnel_url.txt")
-iso_bqa start > /dev/null
+iso_duachuot start > /dev/null
 [ "$(cat "$ISO_DIR/logs/tunnel.pid")" = "$ISO_TUNNEL_BEFORE" ]
-iso_bqa server restart --json > "$TMP_DIR/iso-server-restart.json"
+iso_duachuot server restart --json > "$TMP_DIR/iso-server-restart.json"
 json_assert "$TMP_DIR/iso-server-restart.json" "data['ok'] is True and data['tunnel_preserved'] is True"
 [ "$(cat "$ISO_DIR/logs/tunnel.pid")" = "$ISO_TUNNEL_BEFORE" ]
 [ "$(cat "$ISO_DIR/logs/tunnel_url.txt")" = "$ISO_URL_BEFORE" ]
-iso_bqa stop > /dev/null
-expect_exit 1 iso_bqa status --json
-expect_exit 2 iso_bqa restart
-iso_bqa restart --yes > /dev/null
+iso_duachuot stop > /dev/null
+expect_exit 1 iso_duachuot status --json
+expect_exit 2 iso_duachuot restart
+iso_duachuot restart --yes > /dev/null
 sleep 0.3
 ISO_URL_AFTER=$(cat "$ISO_DIR/logs/tunnel_url.txt")
 [ "$ISO_URL_AFTER" != "$ISO_URL_BEFORE" ]
-iso_bqa stop > /dev/null
+iso_duachuot stop > /dev/null
 pass "isolated start/idempotency/status/server-restart/stop/restart confirmation/full restart"
 
 CURRENT_TEST="live idempotent start"
@@ -351,7 +351,7 @@ pass "live server restart changes only server PID and preserves public flow"
 CURRENT_TEST="final source checks"
 "$PYTHON" -m pytest -q > "$TMP_DIR/pytest.txt"
 "$PYTHON" -m compileall -q app tests
-bash -n run_mcp_tunnel.sh scripts/start_tunnel_server.sh scripts/restart_server_only.sh scripts/install_basic.sh scripts/manual_test_cli.sh bin/bqa
+bash -n run_mcp_tunnel.sh scripts/start_tunnel_server.sh scripts/restart_server_only.sh scripts/install_basic.sh scripts/manual_test_cli.sh bin/duachuot
 git diff --check
 pass "pytest, compileall, bash syntax, git diff check"
 
