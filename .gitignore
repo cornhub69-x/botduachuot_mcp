@@ -1,0 +1,21 @@
+# Secrets — never commit
+.env
+.env.*
+!.env.example
+
+# Runtime
+.venv/
+logs/
+*.log
+*.pid
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Derived artifacts
+.duachuot-tmp-*/

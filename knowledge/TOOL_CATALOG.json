@@ -1,0 +1,894 @@
+[
+  {
+    "name": "git",
+    "category": "version-control",
+    "purpose": "Distributed version control and repository inspection.",
+    "usage_notes": [
+      "Use status/diff before edits; avoid destructive reset/clean without explicit instruction."
+    ],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "gh",
+    "category": "version-control",
+    "purpose": "GitHub CLI for pull requests, issues, Actions, and authenticated repository operations.",
+    "usage_notes": [
+      "Prefer structured GitHub MCP tools when available for remote mutations."
+    ],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "python3",
+    "category": "languages",
+    "purpose": "Primary Python interpreter for scripts, tests, and automation.",
+    "usage_notes": [
+      "Use the project virtual environment when present."
+    ],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "python",
+    "category": "languages",
+    "purpose": "Python interpreter alias.",
+    "usage_notes": [],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "pip3",
+    "category": "packages",
+    "purpose": "Python package installer.",
+    "usage_notes": [
+      "Inspect project dependency files before installing packages."
+    ],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "uv",
+    "category": "packages",
+    "purpose": "Fast Python package and environment manager.",
+    "usage_notes": [],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "pytest",
+    "category": "testing",
+    "purpose": "Python test runner.",
+    "usage_notes": [
+      "Run focused tests first, then the full relevant suite."
+    ],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "ruff",
+    "category": "quality",
+    "purpose": "Python linter and formatter.",
+    "usage_notes": [],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "mypy",
+    "category": "quality",
+    "purpose": "Static type checker for Python.",
+    "usage_notes": [],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "node",
+    "category": "languages",
+    "purpose": "Node.js JavaScript runtime.",
+    "usage_notes": [],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "npm",
+    "category": "packages",
+    "purpose": "Node.js package manager.",
+    "usage_notes": [],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "pnpm",
+    "category": "packages",
+    "purpose": "Disk-efficient Node.js package manager.",
+    "usage_notes": [],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "npx",
+    "category": "packages",
+    "purpose": "Execute Node.js package binaries.",
+    "usage_notes": [],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "go",
+    "category": "languages",
+    "purpose": "Go compiler and tooling.",
+    "usage_notes": [],
+    "version_args": [
+      "version"
+    ]
+  },
+  {
+    "name": "rustc",
+    "category": "languages",
+    "purpose": "Rust compiler.",
+    "usage_notes": [],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "cargo",
+    "category": "packages",
+    "purpose": "Rust build and package manager.",
+    "usage_notes": [],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "java",
+    "category": "languages",
+    "purpose": "Java runtime.",
+    "usage_notes": [],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "javac",
+    "category": "languages",
+    "purpose": "Java compiler.",
+    "usage_notes": [],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "mvn",
+    "category": "build",
+    "purpose": "Apache Maven build tool.",
+    "usage_notes": [],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "gradle",
+    "category": "build",
+    "purpose": "Gradle build tool.",
+    "usage_notes": [],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "make",
+    "category": "build",
+    "purpose": "Make-based build automation.",
+    "usage_notes": [],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "cmake",
+    "category": "build",
+    "purpose": "Cross-platform build configuration generator.",
+    "usage_notes": [],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "gcc",
+    "category": "compilers",
+    "purpose": "GNU C compiler.",
+    "usage_notes": [],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "g++",
+    "category": "compilers",
+    "purpose": "GNU C++ compiler.",
+    "usage_notes": [],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "docker",
+    "category": "containers",
+    "purpose": "Docker container engine and CLI.",
+    "usage_notes": [
+      "Verify daemon availability separately from CLI presence."
+    ],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "docker-compose",
+    "category": "containers",
+    "purpose": "Docker Compose standalone command.",
+    "usage_notes": [],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "podman",
+    "category": "containers",
+    "purpose": "Daemonless OCI container engine.",
+    "usage_notes": [],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "bash",
+    "category": "shell",
+    "purpose": "GNU Bourne Again Shell used by host_run_command.",
+    "usage_notes": [],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "zsh",
+    "category": "shell",
+    "purpose": "Z shell.",
+    "usage_notes": [],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "rg",
+    "category": "search",
+    "purpose": "ripgrep recursive text search.",
+    "usage_notes": [],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "grep",
+    "category": "search",
+    "purpose": "POSIX/GNU text search.",
+    "usage_notes": [],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "find",
+    "category": "search",
+    "purpose": "Filesystem traversal and filtering.",
+    "usage_notes": [],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "jq",
+    "category": "data",
+    "purpose": "JSON query and transformation tool.",
+    "usage_notes": [],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "curl",
+    "category": "network",
+    "purpose": "HTTP and general URL transfer client.",
+    "usage_notes": [],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "wget",
+    "category": "network",
+    "purpose": "File and web resource downloader.",
+    "usage_notes": [],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "openssl",
+    "category": "security",
+    "purpose": "TLS, certificate, hashing, and cryptographic CLI.",
+    "usage_notes": [],
+    "version_args": [
+      "version"
+    ]
+  },
+  {
+    "name": "nmap",
+    "category": "network",
+    "purpose": "Network service discovery and port scanning.",
+    "usage_notes": [
+      "Use only against systems the user is authorized to assess."
+    ],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "shellcheck",
+    "category": "quality",
+    "purpose": "Static analysis for shell scripts.",
+    "usage_notes": [],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "file",
+    "category": "analysis",
+    "purpose": "Identify file formats using magic signatures.",
+    "usage_notes": [],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "strings",
+    "category": "analysis",
+    "purpose": "Extract printable strings from binary files.",
+    "usage_notes": [],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "readelf",
+    "category": "analysis",
+    "purpose": "Inspect ELF binaries.",
+    "usage_notes": [],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "objdump",
+    "category": "analysis",
+    "purpose": "Display object and executable file information.",
+    "usage_notes": [],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "gdb",
+    "category": "analysis",
+    "purpose": "GNU debugger.",
+    "usage_notes": [],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "tshark",
+    "category": "analysis",
+    "purpose": "Command-line packet analysis.",
+    "usage_notes": [],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "exiftool",
+    "category": "analysis",
+    "purpose": "Metadata extraction and editing.",
+    "usage_notes": [],
+    "version_args": [
+      "-ver"
+    ]
+  },
+  {
+    "name": "binwalk",
+    "category": "analysis",
+    "purpose": "Firmware and embedded file signature analysis.",
+    "usage_notes": [],
+    "version_args": [
+      "--help"
+    ]
+  },
+  {
+    "name": "ffmpeg",
+    "category": "media",
+    "purpose": "Audio and video conversion and inspection.",
+    "usage_notes": [],
+    "version_args": [
+      "-version"
+    ]
+  },
+  {
+    "name": "convert",
+    "category": "media",
+    "purpose": "ImageMagick image conversion command.",
+    "usage_notes": [],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "theHarvester",
+    "category": "osint",
+    "purpose": "Email, subdomain, IP, and virtual host enumeration from public sources.",
+    "usage_notes": [
+      "Supports sources: google, bing, baidu, yahoo, crtsh, dnsdumpster, hunter, threatcrowd, etc."
+    ],
+    "version_args": [
+      "-h"
+    ]
+  },
+  {
+    "name": "sherlock",
+    "category": "osint",
+    "purpose": "Search username across 400+ social networks.",
+    "usage_notes": [
+      "Use --timeout to avoid rate limits; --output for results file."
+    ],
+    "version_args": [
+      "--help"
+    ]
+  },
+  {
+    "name": "holehe",
+    "category": "osint",
+    "purpose": "Check if an email is registered on various web services.",
+    "usage_notes": [
+      "Supports --only-used and --no-color flags."
+    ],
+    "version_args": [
+      "--help"
+    ]
+  },
+  {
+    "name": "maigret",
+    "category": "osint",
+    "purpose": "Advanced username search across 2500+ sites with rich report output.",
+    "usage_notes": [
+      "Generates HTML/JSON reports; supports --pdf, --all-sites, --retries."
+    ],
+    "version_args": [
+      "--help"
+    ]
+  },
+  {
+    "name": "shodan",
+    "category": "osint",
+    "purpose": "Shodan API client for Internet-connected device search.",
+    "usage_notes": [
+      "Requires API key (SHODAN_API_KEY); subcommands: search, host, scan, info."
+    ],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "censys",
+    "category": "osint",
+    "purpose": "Censys search and enumeration CLI for Internet assets.",
+    "usage_notes": [
+      "Requires CENSYS_API_ID and CENSYS_API_SECRET env vars."
+    ],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "whatweb",
+    "category": "web",
+    "purpose": "Fingerprint web technologies, CMS versions, and server info.",
+    "usage_notes": [
+      "Use --aggression 3 for aggressive probing; output formats: --log-json, --log-verbose."
+    ],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "dnsrecon",
+    "category": "network",
+    "purpose": "DNS enumeration with SRV, MX, AAAA, zone transfer, reverse lookup and brute force.",
+    "usage_notes": [
+      "Use -d for domain, -t for type (std, brt, srv, axfr, etc.)."
+    ],
+    "version_args": [
+      "--help"
+    ]
+  },
+  {
+    "name": "whois",
+    "category": "osint",
+    "purpose": "Query domain registration and IP whois databases.",
+    "usage_notes": [
+      "Directly follow with domain or IP; -h for whois server override."
+    ],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "nikto",
+    "category": "web",
+    "purpose": "Web server vulnerability scanner.",
+    "usage_notes": [
+      "Use -h for target; -ssl for HTTPS; -Tuning for test selection."
+    ],
+    "version_args": [
+      "-Version"
+    ]
+  },
+  {
+    "name": "sqlmap",
+    "category": "web",
+    "purpose": "Automated SQL injection detection and exploitation.",
+    "usage_notes": [
+      "Use -u for URL; --batch for non-interactive; --dump to extract data."
+    ],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "ffuf",
+    "category": "web",
+    "purpose": "Fast web fuzzer for directory/parameter discovery.",
+    "usage_notes": [
+      "Use -u for URL with FUZZ keyword; -w for wordlist; -recursion for recursive scanning."
+    ],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "gobuster",
+    "category": "web",
+    "purpose": "Directory/file and DNS subdomain brute force.",
+    "usage_notes": [
+      "Modes: dir, dns, vhost; use -u for URL, -w for wordlist."
+    ],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "hydra",
+    "category": "security",
+    "purpose": "Network login brute-force (SSH, FTP, HTTP, MySQL, etc.).",
+    "usage_notes": [
+      "Use -l for user, -P for password list, -t for threads, -V for verbose."
+    ],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "john",
+    "category": "security",
+    "purpose": "John the Ripper password cracker.",
+    "usage_notes": [
+      "Use john hashfile --wordlist=wordlist.txt; --rules for mangling rules."
+    ],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "hashcat",
+    "category": "security",
+    "purpose": "GPU-accelerated password hash cracking.",
+    "usage_notes": [
+      "Use -m for hash mode, -a for attack mode, -o for output file."
+    ],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "radare2",
+    "category": "analysis",
+    "purpose": "Advanced binary analysis and reverse engineering framework.",
+    "usage_notes": [
+      "Commands: aaa (analyze), afl (list functions), VV (graph mode), s (seek)."
+    ],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "ghidra",
+    "category": "analysis",
+    "purpose": "NSA Ghidra reverse engineering platform (GUI).",
+    "usage_notes": [
+      "Launch headless: ghidraHeadless; standard: ghidraRun."
+    ],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "checksec",
+    "category": "analysis",
+    "purpose": "Check binary security properties (PIE, NX, RELRO, Stack Canary, FORTIFY).",
+    "usage_notes": [
+      "Use --file=./binary to inspect a single binary; runs with pwntools."
+    ],
+    "version_args": [
+      "--help"
+    ]
+  },
+  {
+    "name": "ROPgadget",
+    "category": "analysis",
+    "purpose": "Find ROP gadgets in ELF/PE binaries for exploit development.",
+    "usage_notes": [
+      "Use --binary for file; --ropchain to auto-generate chain."
+    ],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "one_gadget",
+    "category": "analysis",
+    "purpose": "Find one-shot RCE gadgets in glibc (execve /bin/sh).",
+    "usage_notes": [
+      "Pass libc binary as argument; shows constraints for each gadget."
+    ],
+    "version_args": [
+      "--help"
+    ]
+  },
+  {
+    "name": "steghide",
+    "category": "analysis",
+    "purpose": "Hide/extract data in/from image and audio files.",
+    "usage_notes": [
+      "Use embed -cf coverfile -ef datafile; extract -sf stegofile; needs passphrase."
+    ],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "foremost",
+    "category": "analysis",
+    "purpose": "File carving tool that recovers files based on headers/footers.",
+    "usage_notes": [
+      "Use -i input_file -o output_dir; -t for file type selection."
+    ],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "vol",
+    "category": "analysis",
+    "purpose": "Volatility 3 memory forensics framework.",
+    "usage_notes": [
+      "Subcommands: windows.info, linux.pslist, windows.filescan, etc."
+    ],
+    "version_args": [
+      "--help"
+    ]
+  },
+  {
+    "name": "tcpdump",
+    "category": "network",
+    "purpose": "Command-line packet capture and analysis.",
+    "usage_notes": [
+      "Use -i for interface; -w to write; -r to read; filter with BPF syntax."
+    ],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "wireshark",
+    "category": "network",
+    "purpose": "GUI network protocol analyzer.",
+    "usage_notes": [
+      "Supports live capture and pcap analysis; use tshark for CLI."
+    ],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "netcat",
+    "category": "network",
+    "purpose": "TCP/UDP Swiss-army knife for network debugging and CTF exploitation.",
+    "usage_notes": [
+      "nc host port; nc -lvp port for listener; -e for exec (legacy)."
+    ],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "ncat",
+    "category": "network",
+    "purpose": "Improved Nmap netcat with SSL support and connection brokering.",
+    "usage_notes": [
+      "ncat --ssl host port for SSL connections; -l for listener."
+    ],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "socat",
+    "category": "network",
+    "purpose": "Multi-purpose relay for bidirectional data transfer.",
+    "usage_notes": [
+      "socat TCP-LISTEN:port,fork TCP:host:port for port forwarding."
+    ],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "binwalk",
+    "category": "analysis",
+    "purpose": "Firmware and embedded file signature analysis.",
+    "usage_notes": [
+      "Use -Me for recursive extraction; -D for custom carve rules."
+    ],
+    "version_args": [
+      "--help"
+    ]
+  },
+  {
+    "name": "exiv2",
+    "category": "forensics",
+    "purpose": "EXIF metadata reader used to cross-check exiftool GPS values.",
+    "usage_notes": [
+      "Disagreement between exiftool and exiv2 must be reported as conflicting evidence, never silently merged.",
+      "Example: exiv2 -pa file.jpg | grep -i gps"
+    ],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "exiftran",
+    "category": "forensics",
+    "purpose": "JPEG orientation normalization for consistent heading math.",
+    "usage_notes": [],
+    "version_args": [
+      "--help"
+    ]
+  },
+  {
+    "name": "ffprobe",
+    "category": "media",
+    "purpose": "Multimedia stream inspection (format, streams, duration, GPS location tags in video).",
+    "usage_notes": [
+      "Use -print_format json for machine-readable output."
+    ],
+    "version_args": [
+      "-version"
+    ]
+  },
+  {
+    "name": "tesseract",
+    "category": "forensics",
+    "purpose": "OCR engine for reading text embedded in images.",
+    "usage_notes": [
+      "Run duachuot_ocr_probe; verify low-confidence reads against pixels."
+    ],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "sleuthkit",
+    "category": "forensics",
+    "purpose": "Disk image analysis: fls, fsstat, icat, mmls.",
+    "usage_notes": [
+      "Preserve originals; use offset-aware commands."
+    ],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "volatility3",
+    "category": "forensics",
+    "purpose": "Volatility 3 launcher alias for python3 -m volatility3.",
+    "usage_notes": [],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "stegsolve",
+    "category": "forensics",
+    "purpose": "Image channel/plane analysis for LSB steganography.",
+    "usage_notes": [
+      "GUI tool; automate with zsteg when available."
+    ],
+    "version_args": [
+      "--help"
+    ]
+  },
+  {
+    "name": "zsteg",
+    "category": "forensics",
+    "purpose": "LSB steganography detection for PNG/BMP.",
+    "usage_notes": [],
+    "version_args": [
+      "--help"
+    ]
+  },
+  {
+    "name": "gpsbabel",
+    "category": "forensics",
+    "purpose": "Convert between GPS track/waypoint formats (GPX, KML, NMEA).",
+    "usage_notes": [
+      "Not installed by default; flagged as optional in Tool Matrix."
+    ],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "gdal",
+    "category": "geo",
+    "purpose": "GDAL geospatial data processing (convert.py prefers pure-python; gdal is optional).",
+    "usage_notes": [
+      "Optional; Geo Engine is pure-python and offline."
+    ],
+    "version_args": [
+      "--version"
+    ]
+  },
+  {
+    "name": "proj",
+    "category": "geo",
+    "purpose": "Coordinate transformation reference (projinfo).",
+    "usage_notes": [
+      "Optional; only for validation of datum results."
+    ],
+    "version_args": [
+      "--version"
+    ]
+  }
+]
