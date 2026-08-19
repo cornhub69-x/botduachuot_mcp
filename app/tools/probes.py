@@ -7,8 +7,12 @@ clear BLOCKER-style error when the tool is missing, so callers never guess.
 from __future__ import annotations
 
 import json
+import os
+import re
 import shutil
 import subprocess  # nosec B404
+import tempfile
+import wave
 from typing import Any, Optional
 
 from app.mcp_server import mcp
@@ -157,6 +161,75 @@ def duachuot_mem_probe(path: str, os_hint: Optional[str] = None) -> dict[str, An
         return format_error_response(exc)
 
 
+_FLAG_LIKE_RE = re.compile(r"[A-Za-z0-9_\-]{3,}")
+
+def _lsb_analysis(path: str, limit_frames: int = 20000) -> dict[str, Any]:
+    """Detect LSB stego bias in a PCM WAV without external tools.
+
+    Clean PCM audio has a ~50/50 least-significant-bit distribution; a hidden
+    LSB message biases it. Returns distribution stats plus a heuristic verdict.
+    """
+    try:
+        with wave.open(path, "rb") as wav:
+            n_frames = min(wav.getnframes(), limit_frames)
+            sampwidth = wav.getsampwidth()
+            channels = wav.getnchannels()
+            if sampwidth > 4:
+                return {"supported": False, "note": "unsupported sample width"}
+            frames = wav.readframes(n_frames)
+            nbytes = len(frames)
+            if nbytes == 0:
+                return {"supported": False, "note": "empty audio"}
+            import struct
+
+            ones = 0
+            seen = 0
+            for i in range(0, nbytes - (nbytes % (channels * sampwidth)), channels * sampwidth):
+                for ch in range(channels):
+                    offset = i + ch * sampwidth
+                    sample = struct.unpack_from("<h", frames, offset)[0]
+                    ones += sample & 1
+                    seen += 1
+            if seen == 0:
+                return {"supported": False, "note": "no samples decoded"}
+            p1 = ones / seen
+            deviation = abs(p1 - 0.5)
+            return {
+                "supported": True,
+                "channels": channels,
+                "sample_width": sampwidth,
+                "frames_analyzed": n_frames,
+                "lsb_ones_fraction": round(p1, 5),
+                "deviation_from_0_5": round(deviation, 5),
+                "suspicious": deviation > 0.12,
+            }
+    except (wave.Error, OSError, EOFError):
+        return {"supported": False, "note": "not a parseable PCM WAV"}
+
+
+def _extract_text_from_output(result: dict[str, Any]) -> Optional[str]:
+    """First printable/flag-like content found in a tool's stdout+stderr."""
+    if result.get("exit_code") is None:
+        return None
+    text = (result.get("stdout") or "") + "\n" + (result.get("stderr") or "")
+    for line in text.splitlines():
+        stripped = line.strip()
+        if not stripped or stripped in {"", "Output file written", "Image overwritten"}:
+            continue
+        if _FLAG_LIKE_RE.search(stripped) and any(
+            ch.isalpha() for ch in stripped
+        ):
+            return stripped[:500]
+    return None
+
+
+def _optional_run(tool: str, args: list[str], *, timeout: int = 60) -> dict[str, Any]:
+    """Run an optional probe tool; missing tool yields a non-fatal note."""
+    if not shutil.which(tool):
+        return {"tool": tool, "exit_code": None, "note": f"tool '{tool}' not installed", "stdout": "", "stderr": ""}
+    return _run(tool, args, timeout=timeout)
+
+
 @mcp.tool(
     name="duachuot_stego_probe",
     description=(
@@ -168,8 +241,81 @@ def duachuot_mem_probe(path: str, os_hint: Optional[str] = None) -> dict[str, An
 def duachuot_stego_probe(path: str) -> dict[str, Any]:
     try:
         result: dict[str, Any] = {"ok": True, "path": path}
-        result["binwalk"] = _run("binwalk", [path], timeout=60)
-        result["steghide_info"] = _run("steghide", ["info", path], timeout=30)
+        result["binwalk"] = _optional_run("binwalk", [path], timeout=60)
+        result["steghide_info"] = _optional_run("steghide", ["info", path], timeout=30)
+
+        with open(path, "rb") as fh:
+            magic = fh.read(16)
+
+        if magic.startswith(b"RIFF") and magic[8:12] == b"WAVE":
+            result["kind"] = "wav"
+            lsb = _lsb_analysis(path)
+            result["lsb_analysis"] = lsb
+            with tempfile.TemporaryDirectory() as tmp:
+                out = os.path.join(tmp, "decoded.bin")
+                wavsteg = _optional_run(
+                    "wavsteg", ["decode", "--wav", path, "--out", out], timeout=120
+                )
+                if wavsteg.get("exit_code") == 0 and os.path.exists(out):
+                    with open(out, "rb") as fh_out:
+                        raw = fh_out.read()
+                    wavsteg["payload_preview"] = (
+                        raw[:500].decode("utf-8", errors="replace")
+                    )
+                else:
+                    wavsteg["payload_preview"] = ""
+                wavsteg["extracted"] = (
+                    wavsteg.get("payload_preview")
+                    or _extract_text_from_output(wavsteg)
+                )
+                result["wavsteg_decode"] = wavsteg
+        elif magic.startswith(b"\x89PNG") or magic.startswith(b"BM"):
+            result["kind"] = "png_bmp"
+            with tempfile.TemporaryDirectory() as tmp:
+                out = os.path.join(tmp, "recovered.bin")
+                stegolsb = _optional_run(
+                    "stegolsb",
+                    ["steglsb", "-r", "-i", path, "-o", out, "-n", "1"],
+                    timeout=120,
+                )
+                if stegolsb.get("exit_code") == 0 and os.path.exists(out):
+                    with open(out, "rb") as fh_out:
+                        raw = fh_out.read()
+                    stegolsb["payload_preview"] = raw[:500].decode(
+                        "utf-8", errors="replace"
+                    )
+                stegolsb["extracted"] = (
+                    stegolsb.get("payload_preview")
+                    or _extract_text_from_output(stegolsb)
+                )
+                result["stegolsb_recover"] = stegolsb
+        elif magic.startswith(b"ID3") or magic[2:4] == b"\xff\xfb" or magic[2:4] == b"\xff\xf3":
+            result["kind"] = "mp3"
+            with tempfile.TemporaryDirectory() as tmp:
+                out = os.path.join(tmp, "decoded.txt")
+                pbhide = _optional_run(
+                    "pbhide", ["extract", path, out], timeout=120
+                )
+                if pbhide.get("exit_code") == 0 and os.path.exists(out):
+                    with open(out, "rb") as fh_out:
+                        raw = fh_out.read()
+                    pbhide["payload_preview"] = raw[:500].decode(
+                        "utf-8", errors="replace"
+                    )
+                else:
+                    pbhide["payload_preview"] = ""
+                    pbhide["note"] = (
+                        "no payload extracted; if the MP3 was encoded with the "
+                        "original MP3Stego, decode it with wine + Decode.exe "
+                        "(see docs/INVESTIGATION.md requirements)"
+                    )
+                pbhide["extracted"] = (
+                    pbhide.get("payload_preview")
+                    or _extract_text_from_output(pbhide)
+                )
+                result["pbhide_extract"] = pbhide
+        else:
+            result["kind"] = "other"
         return result
     except Exception as exc:
         return format_error_response(exc)

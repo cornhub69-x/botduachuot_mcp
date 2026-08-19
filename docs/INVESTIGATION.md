@@ -70,7 +70,7 @@ handles GPX/KML/GeoJSON/JSON-keyed/SRT and falls back to text scanning.
 `app/tools/probes.py` — `duachuot_media_probe` (file+exiftool+ffprobe),
 `duachuot_pcap_probe` (tshark: conversations/endpoints/DNS + GPS hints NMEA/Wi-Fi),
 `duachuot_disk_probe` (fsstat+fls), `duachuot_mem_probe` (vol), `duachuot_stego_probe`
-(binwalk+steghide), `duachuot_ocr_probe` (tesseract+QR zxing), `duachuot_win_probe`
+(binwalk+steghide, WAV LSB bias detection, wavsteg/stegolsb/pbhide extraction), `duachuot_ocr_probe` (tesseract+QR zxing), `duachuot_win_probe`
 (SAM/SYSTEM hives, LNK, prefetch — pure-Python).
 
 `app/tools/ops_tools.py` — `duachuot_ops_check`, `duachuot_ops_jitter`,
@@ -126,3 +126,11 @@ BLOCKER messages when a binary is missing (never silent fallbacks):
   `pipx install volatility3`; the probe resolves it from PATH.
 - `tshark`, `exiftool`, `ffprobe`, `binwalk`, `steghide`, `fsstat`/`fls`,
   `zxing-cpp` are resolved the same way; `duachuot_platform` reports each.
+- Audio/image LSB extraction in `duachuot_stego_probe`: `wavsteg` (WAV LSB,
+  build from `samolds/wavsteg` with `make`), `stegolsb` (PNG/BMP LSB,
+  `pip install stego-lsb`), `pbhide` (MP3Stego decoder, build from
+  `mbionchi/mp3stego` with `make`). WAV LSB *detection* is pure-Python
+  (sample LSB distribution analysis), so it never depends on tool presence.
+  Files encoded with the original Windows MP3Stego require `wine` +
+  `Decode.exe` (see the `stego-toolkit` installer scripts); the probe reports
+  this as a note when nothing is extracted.

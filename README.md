@@ -232,7 +232,7 @@ duachuot_media_probe         # file + exiftool JSON + ffprobe
 duachuot_pcap_probe          # conversations/endpoints/DNS + GPS hints (NMEA, Wi-Fi probes)
 duachuot_disk_probe          # fsstat + fls
 duachuot_mem_probe           # Volatility 3 (info/pslist)
-duachuot_stego_probe         # binwalk + steghide
+duachuot_stego_probe         # binwalk + steghide, WAV LSB detection, LSB/MP3 extraction
 duachuot_ocr_probe           # tesseract + QR (zxing-cpp)
 duachuot_win_probe           # SAM/SYSTEM hives, LNK, prefetch (pure-Python, Linux/Windows)
 
