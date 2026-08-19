@@ -106,3 +106,17 @@ Install: `bin/duachuot` (venv-aware). Add to PATH or use `scripts/install_cli.sh
 2. Every command/network target → `duachuot_ops_check` first; wait for the jitter between steps.
 3. Coordinates: `geo_extract` → `coord_convert` → `geo_reverse` → `geo_verify` (≥2 facts).
 4. Logs go through `ops_redact`; flags are only shown to humans, never auto-submitted.
+
+### Requirements / tool availability
+
+Optional forensic tools are detected at runtime; probes degrade with clear
+BLOCKER messages when a binary is missing (never silent fallbacks):
+
+- `tesseract` needs the `eng` traineddata. Debian/Ubuntu: `apt install
+  tesseract-ocr-eng`. User-local: download `eng.traineddata` from
+  `tesseract-ocr/tessdata_fast` into `~/.local/share/tessdata/` and set
+  `TESSDATA_PREFIX` in `.env` (the launch scripts export it automatically).
+- `vol` (Volatility 3) powers `duachuot_mem_probe`. Install e.g. via
+  `pipx install volatility3`; the probe resolves it from PATH.
+- `tshark`, `exiftool`, `ffprobe`, `binwalk`, `steghide`, `fsstat`/`fls`,
+  `zxing-cpp` are resolved the same way; `duachuot_platform` reports each.
