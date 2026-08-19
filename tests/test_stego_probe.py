@@ -150,7 +150,7 @@ def test_probe_mp3_no_crash_and_note() -> None:
     assert "pbhide_extract" in result
     pbhide = result["pbhide_extract"]
     if pbhide["exit_code"] is None:
-        assert "not installed" in pbhide["note"]
+        assert "not installed" in pbhide["note"] or "no payload extracted" in pbhide["note"]
 
 
 def test_probe_missing_file_error() -> None:

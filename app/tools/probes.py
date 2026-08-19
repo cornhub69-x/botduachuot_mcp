@@ -304,10 +304,12 @@ def duachuot_stego_probe(path: str) -> dict[str, Any]:
                     )
                 else:
                     pbhide["payload_preview"] = ""
+                    missing = pbhide.get("note", "")
                     pbhide["note"] = (
-                        "no payload extracted; if the MP3 was encoded with the "
-                        "original MP3Stego, decode it with wine + Decode.exe "
-                        "(see docs/INVESTIGATION.md requirements)"
+                        (missing + "; " if missing else "")
+                        + "no payload extracted; if the MP3 was encoded with "
+                        "the original MP3Stego, decode it with wine + "
+                        "Decode.exe (see docs/INVESTIGATION.md requirements)"
                     )
                 pbhide["extracted"] = (
                     pbhide.get("payload_preview")
