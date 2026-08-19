@@ -196,10 +196,17 @@ def test_stego_probe_structure(tmp_path: Path) -> None:
 
 
 @requires(not _has("convert", "tesseract"), reason="ImageMagick/tesseract missing")
-@pytest.mark.skipif(
-    "eng" not in subprocess.run(  # noqa: S603
+def _tesseract_has_eng() -> bool:
+    if shutil.which("tesseract") is None:
+        return False
+    out = subprocess.run(  # noqa: S603
         ["tesseract", "--list-langs"], capture_output=True, text=True
-    ).stdout.split(),
+    ).stdout.split()
+    return "eng" in out
+
+
+@pytest.mark.skipif(
+    not _tesseract_has_eng(),
     reason="tesseract eng traineddata missing",
 )
 def test_ocr_probe_reads_rendered_text(tmp_path: Path) -> None:
