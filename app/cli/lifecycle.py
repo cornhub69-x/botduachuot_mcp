@@ -45,7 +45,9 @@ def process_matches(pid: int | None, kind: str) -> bool:
     if kind in {"supervisor", "launcher"}:
         return "start_tunnel_server.sh" in command_line
     if kind == "server":
-        return "fastmcp" in command_line and "app/main.py" in command_line
+        return "app/main.py" in command_line and (
+            "fastmcp" in command_line or "python -m app.main" in command_line
+        )
     if kind == "tunnel":
         return all(fragment in command_line for fragment in ("cloudflared", "tunnel", "--url"))
     return False
@@ -97,7 +99,7 @@ def status_data(repo_root: Path, values: dict[str, str]) -> dict[str, Any]:
     )
     server_pid = read_pid(logs / "server.pid")
     tunnel_pid = read_pid(logs / "tunnel.pid")
-    server_running = process_matches(server_pid, "server")
+    server_running = process_matches(server_pid, "server") or bridge_ready(values)
     tunnel_running = process_matches(tunnel_pid, "tunnel")
     url = connector_url(repo_root, values) if tunnel_running else None
     bridge = "ready" if server_running and bridge_ready(values) else "starting" if server_running else "stopped"

@@ -2,7 +2,7 @@
 
 ## Trust model
 
-BotQuangAnh Host MCP intentionally reads files and executes commands with the privileges of the operating-system user that starts the service. It is **not a sandbox**. The `guarded` command policy blocks explicit destructive or privileged patterns, but it does not make arbitrary shell execution safe against an untrusted caller.
+BotDuaChuot Host MCP intentionally reads files and executes commands with the privileges of the operating-system user that starts the service. It is **not a sandbox**. The `guarded` command policy blocks explicit destructive or privileged patterns, but it does not make arbitrary shell execution safe against an untrusted caller.
 
 The development runtime currently uses `REQUIRE_AUTH=false` by explicit operator choice. Production exposure must enable authentication and use a fresh token.
 

@@ -31,7 +31,8 @@ pid_matches_kind() {
             [[ "$command_line" == *"start_tunnel_server.sh"* ]]
             ;;
         server)
-            [[ "$command_line" == *"fastmcp"* && "$command_line" == *"app/main.py"* ]]
+            [[ "$command_line" == *"app/main.py"* ]] || return 1
+            [[ "$command_line" == *"fastmcp"* || "$command_line" == *"python -m app.main"* ]]
             ;;
         tunnel)
             [[ "$command_line" == *"cloudflared"* && "$command_line" == *"tunnel"* && "$command_line" == *"--url"* ]]
