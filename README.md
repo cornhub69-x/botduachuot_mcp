@@ -214,14 +214,15 @@ duachuot_knowledge
 
 ## Investigation tools (Forensics + OSINT + Geo)
 
-BotDuaChuot adds 20 dedicated investigation tools, fully offline and deterministic:
+BotDuaChuot adds 21 dedicated investigation tools, fully offline and deterministic:
 
 ```text
 # Geo Engine (offline, no network required)
 duachuot_geo_extract         # EXIF GPS, exiftool/exiv2 cross-check, DOP/HPE, timezone, landmarks
+duachuot_geo_scan            # scan arbitrary text/logs/SRT/NMEA/MGRS/UTM for coordinates
 duachuot_coord_convert       # DMS/decimal/UTM/MGRS + datum transform (WGS84/ED50/NAD27)
 duachuot_geo_calc            # geodesic distance/bearing + uncertainty from DOP/HPE
-duachuot_geo_reverse         # offline reverse geocoding (landmarks.json dataset)
+duachuot_geo_reverse         # offline reverse geocoding (landmarks + country resolution)
 duachuot_geo_verify          # conclude only with >= 2 independent facts; fewer -> BLOCKER
 duachuot_geo_landmark_check  # radius check around a landmark
 duachuot_timezone_at         # offline timezone/UTC offset from coordinates

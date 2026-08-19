@@ -14,7 +14,10 @@ from app.geo.convert import (
     to_mgrs,
     to_utm,
 )
+from app.geo.countries import resolve_country
 from app.geo.exif_gps import extract_cross_checked, extract_with_exiftool
+from app.geo.extract import extract_file_coordinates
+from app.geo.scanner import scan_text
 from app.geo.geodesic import uncertainty_from_dop, vincenty_inverse
 from app.geo.reverse import is_within, nearest_landmarks
 from app.geo.timezone import timezone_at
@@ -46,6 +49,14 @@ def duachuot_geo_extract(
             result["accuracy"] = accuracy
             result["timezone"] = tz
             result["landmarks"] = nearest_landmarks(gps["lat"], gps["lon"])
+            result["country"] = resolve_country(gps["lat"], gps["lon"])
+        else:
+            try:
+                file_coords = extract_file_coordinates(path)
+                if file_coords.get("count"):
+                    result["file_coords"] = file_coords
+            except Exception:
+                pass
         return {"ok": True, **result}
     except Exception as exc:
         return format_error_response(exc)
@@ -150,6 +161,21 @@ def duachuot_geo_calc(
 
 
 @mcp.tool(
+    name="duachuot_geo_scan",
+    description=(
+        "Scan arbitrary text (chat logs, HTML, JSON, GPX/KML text, NMEA "
+        "sentences, DJI drone .srt, MGRS/UTM grids) for coordinates and "
+        "normalize every hit to decimal WGS84 with confidence and context."
+    ),
+)
+def duachuot_geo_scan(text: str, source: str = "inline") -> dict[str, Any]:
+    try:
+        return scan_text(text, source=source)
+    except Exception as exc:
+        return format_error_response(exc)
+
+
+@mcp.tool(
     name="duachuot_geo_reverse",
     description=(
         "Offline reverse geocoding against the local landmark dataset: nearest "
@@ -168,6 +194,7 @@ def duachuot_geo_reverse(
             "ok": True,
             "lat": float(lat),
             "lon": float(lon),
+            "country": resolve_country(float(lat), float(lon)),
             "matches": matches,
             "dataset": str(app.config.GEO_DATASETS_DIR / "landmarks.json"),
             "note": "offline dataset; verify conclusions with a second independent fact",
@@ -205,6 +232,25 @@ def duachuot_geo_verify(
                 {
                     "kind": "landmark",
                     "detail": f"nearest landmark '{nearest['name']}' at {nearest['distance_m']:.0f} m",
+                    "independent": True,
+                }
+            )
+
+        country = resolve_country(lat_f, lon_f)
+        if country.get("ok"):
+            country_detail = f"coordinate resolves to {country['name']} ({country['iso2']})"
+            if country.get("ambiguous") and matches:
+                landmark_country = str(matches[0].get("country") or "")
+                alternatives = [item["iso2"] for item in country.get("alternatives", [])]
+                if landmark_country and landmark_country in alternatives + [country["iso2"]]:
+                    country_detail = (
+                        f"country {landmark_country} disambiguated from bbox overlap "
+                        f"by nearest landmark '{matches[0]['name']}'"
+                    )
+            facts.append(
+                {
+                    "kind": "country",
+                    "detail": country_detail,
                     "independent": True,
                 }
             )

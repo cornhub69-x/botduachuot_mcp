@@ -54,12 +54,18 @@ Default mode is `ctf-live` from `app.config.OSINT_MODE` (False). Set
   Linux/macOS; WSL bridge, `powershell -NoProfile`, or `cmd /d /s /c` on Windows.
   Strategy: python-portable > native PATH > pkg-manager > WSL2.
 
-## 4. New MCP tools (20)
+## 4. New MCP tools (21)
 
 `app/tools/geo_tools.py` — `duachuot_geo_extract`, `duachuot_coord_convert`
-(DMS/decimal/UTM/**MGRS** input), `duachuot_geo_calc`, `duachuot_geo_reverse`,
-`duachuot_geo_verify` (≥2 independent facts → confidence; fewer → BLOCKER),
-`duachuot_geo_landmark_check`, `duachuot_timezone_at`.
+(DMS/decimal/UTM/**MGRS** input), `duachuot_geo_scan` (scan arbitrary text:
+NMEA, MGRS/UTM grids, DMS/DM, labelled lat/lon, decimal pairs, DJI `.srt`
+telemetry; normalized to WGS84 decimal with confidence), `duachuot_geo_calc`,
+`duachuot_geo_reverse` (offline reverse geocoding: landmarks + country
+resolution from a ~230-entry bbox dataset; bbox-overlap ambiguity flagged and
+disambiguated via nearest landmark), `duachuot_geo_verify` (≥2 independent
+facts → confidence; fewer → BLOCKER), `duachuot_geo_landmark_check`,
+`duachuot_timezone_at`. Structured file extraction (`app/geo/extract.py`)
+handles GPX/KML/GeoJSON/JSON-keyed/SRT and falls back to text scanning.
 
 `app/tools/probes.py` — `duachuot_media_probe` (file+exiftool+ffprobe),
 `duachuot_pcap_probe` (tshark: conversations/endpoints/DNS + GPS hints NMEA/Wi-Fi),

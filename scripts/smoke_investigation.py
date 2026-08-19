@@ -22,6 +22,7 @@ async def main() -> int:
     names = {tool.name for tool in tools}
     expected = {
         "duachuot_geo_extract",
+        "duachuot_geo_scan",
         "duachuot_coord_convert",
         "duachuot_geo_calc",
         "duachuot_geo_reverse",
@@ -37,12 +38,18 @@ async def main() -> int:
         print(f"FAIL missing tools: {sorted(missing)}")
         return 1
 
-    from app.tools.geo_tools import duachuot_coord_convert, duachuot_geo_reverse, duachuot_geo_verify
+    from app.tools.geo_tools import (
+        duachuot_coord_convert,
+        duachuot_geo_reverse,
+        duachuot_geo_scan,
+        duachuot_geo_verify,
+    )
     from app.tools.ops_tools import duachuot_ops_check, duachuot_ops_redact, duachuot_platform, duachuot_plan
 
     checks = [
         ("coord_convert", duachuot_coord_convert(lat=21.0285, lon=105.8542).get("ok") is True),
         ("geo_reverse", bool(duachuot_geo_reverse(21.0285, 105.8542).get("matches"))),
+        ("geo_scan", bool(duachuot_geo_scan("drop at 21.0294, 105.8525").get("hits"))),
         ("geo_verify", duachuot_geo_verify(21.0285, 105.8542)["blocked"] is False),
         ("ops_check_blocked", duachuot_ops_check("curl http://api.ipify.org")["allowed"] is False),
         ("ops_redact", "[FLAG_REDACTED]" in duachuot_ops_redact("FLAG{abc12345}")["redacted"]),
