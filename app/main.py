@@ -46,4 +46,11 @@ log_audit_event(
 )
 
 if __name__ == "__main__":
-    mcp.run()
+    if is_stdio:
+        mcp.run()
+    else:
+        mcp.run(
+            transport="streamable-http",
+            host=MCP_BIND_HOST,
+            port=MCP_PORT,
+        )
