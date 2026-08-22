@@ -49,8 +49,7 @@ scripts/
 ├── restart_server_only.sh
 ├── start_tunnel_server.sh
 ├── dev.sh
-├── install_datasets.py
-└── test.sh
+└── install_datasets.py
 ```
 
 ## Installation
@@ -273,7 +272,6 @@ This tool reads the documents in `knowledge/` and matches `TOOL_CATALOG.json` ag
 ## Testing
 
 ```bash
-./scripts/test.sh
 ./scripts/quality_gate.sh
 ./scripts/manual_test_installer.sh
 ```
@@ -378,8 +376,6 @@ Main exit codes:
 For `duachuot cmd run`, when the server executed the command successfully at the request level, the CLI exit code mirrors the real exit code of the command.
 
 Full design: `docs/CLI_DESIGN_PLAN.md`.
-
-Additional CLI docs: `docs/CLI_MANUAL_TEST_PLAN.md` and `docs/CLI_IMPLEMENTATION_REPORT.md`.
 
 ## Operations and recovery
 

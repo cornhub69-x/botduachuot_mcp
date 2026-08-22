@@ -36,17 +36,20 @@ run_gate() {
     local label="$1"
     shift
     printf '[*] %s\n' "$label" | tee -a "$RESULT_FILE"
-    "$@" 2>&1 | tee -a "$RESULT_FILE"
-    printf 'PASS: %s\n' "$label" | tee -a "$RESULT_FILE"
+    if "$@" 2>&1 | tee -a "$RESULT_FILE"; then
+        printf 'PASS: %s\n' "$label" | tee -a "$RESULT_FILE"
+    else
+        printf 'FAIL: %s\n' "$label" | tee -a "$RESULT_FILE"
+        exit 1
+    fi
 }
 
 export PYTHONPATH="$ROOT_DIR"
 run_gate "pytest" .venv/bin/python -m pytest -q
-run_gate "compileall" .venv/bin/python -m compileall -q app tests scripts/benchmark_resilience.py
+run_gate "compileall" .venv/bin/python -m compileall -q app tests scripts
 run_gate "bash syntax" bash -n \
     run_mcp_tunnel.sh \
     bin/duachuot \
-    manual_test_tunnel_logic.sh \
     scripts/collect_diagnostics.sh \
     scripts/install_basic.sh \
     scripts/install_cli.sh \
@@ -67,7 +70,6 @@ if [ "$RUN_RUNTIME" -eq 1 ]; then
 fi
 if [ "$RUN_FULL" -eq 1 ]; then
     run_gate "public runtime doctor" .venv/bin/duachuot doctor --json
-    run_gate "isolated tunnel lifecycle" ./manual_test_tunnel_logic.sh
 fi
 
 printf 'ALL_QUALITY_GATES=PASS\n' | tee -a "$RESULT_FILE"

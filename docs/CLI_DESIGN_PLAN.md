@@ -1003,9 +1003,3 @@ duachuot cmd run --timeout <command-timeout>
 - real server-only restart keeps the tunnel PID and URL;
 - full stop/restart was only run in an isolated environment;
 - no real Cloudflare Tunnel restart during development.
-
-See:
-
-- `docs/CLI_MANUAL_TEST_PLAN.md`;
-- `docs/CLI_IMPLEMENTATION_REPORT.md`;
-- `scripts/manual_test_cli.sh`.

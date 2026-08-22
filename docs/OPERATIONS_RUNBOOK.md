@@ -75,12 +75,6 @@ Include public runtime and isolated lifecycle regression:
 ./scripts/quality_gate.sh --full
 ```
 
-The legacy command remains an alias:
-
-```bash
-./scripts/test.sh
-```
-
 ## 4. Doctor modes
 
 Normal doctor allows warnings:
